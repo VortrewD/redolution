@@ -1,57 +1,49 @@
-import { getDb } from "@/lib/db";
+import { createClient } from "@libsql/client";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-// GET /api/internships?country=Morocco&field=Data%20%2F%20AI&deadlineFrom=2026-12-01&deadlineTo=2027-03-01
-// Returns the rows from the SQLite internships table.
-// Filters use parameterised placeholders only — values are never
-// interpolated into the SQL string.
 export async function GET(request) {
-  const { searchParams } = new URL(request.url);
-  const country = searchParams.get("country") || "";
-  const field = searchParams.get("field") || "";
-  const deadlineFrom = searchParams.get("deadlineFrom") || "";
-  const deadlineTo = searchParams.get("deadlineTo") || "";
+  try {
+    const db = createClient({
+      url: process.env.TURSO_DATABASE_URL,
+      authToken: process.env.TURSO_AUTH_TOKEN,
+    });
 
-  const db = getDb();
+    const { searchParams } = new URL(request.url);
+    const country = searchParams.get("country") || "";
+    const field = searchParams.get("field") || "";
+    const deadlineFrom = searchParams.get("deadlineFrom") || "";
+    const deadlineTo = searchParams.get("deadlineTo") || "";
 
-  const where = [];
-  const params = [];
+    const where = [];
+    const args = [];
 
-  if (country) {
-    where.push("country = ?");
-    params.push(country);
+    if (country) { where.push("country = ?"); args.push(country); }
+    if (field) { where.push("field = ?"); args.push(field); }
+    if (deadlineFrom) { where.push("deadline >= ?"); args.push(deadlineFrom); }
+    if (deadlineTo) { where.push("deadline <= ?"); args.push(deadlineTo); }
+
+    const sql =
+      "SELECT id, title, company, country, field, deadline, docs, url FROM internships" +
+      (where.length ? ` WHERE ${where.join(" AND ")}` : "") +
+      " ORDER BY deadline ASC";
+
+    const result = await db.execute({ sql, args });
+
+    const internships = result.rows.map((row) => {
+      let docs = [];
+      try {
+        docs = JSON.parse(row.docs || "[]");
+      } catch {
+        docs = [];
+      }
+      return { ...row, docs };
+    });
+
+    return Response.json({ internships });
+  } catch (error) {
+    console.error("Database error:", error);
+    return Response.json({ error: error.message }, { status: 500 });
   }
-  if (field) {
-    where.push("field = ?");
-    params.push(field);
-  }
-  if (deadlineFrom) {
-    where.push("deadline >= ?");
-    params.push(deadlineFrom);
-  }
-  if (deadlineTo) {
-    where.push("deadline <= ?");
-    params.push(deadlineTo);
-  }
-
-  const sql =
-    "SELECT id, title, company, country, field, deadline, docs, url FROM internships" +
-    (where.length ? ` WHERE ${where.join(" AND ")}` : "") +
-    " ORDER BY deadline ASC";
-
-  const rows = db.prepare(sql).all(...params);
-
-  const internships = rows.map((row) => {
-    let docs = [];
-    try {
-      docs = JSON.parse(row.docs || "[]");
-    } catch {
-      docs = [];
-    }
-    return { ...row, docs };
-  });
-
-  return Response.json({ internships });
 }
