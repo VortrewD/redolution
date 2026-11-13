@@ -19,11 +19,10 @@ export default function InternshipsDashboard() {
   const { data: session, status } = useSession();
   const router = useRouter();
 
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/");
-    }
-  }, [status, router]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const [limit] = useState(12);
 
   const [internships, setInternships] = useState([]);
   const [allForOptions, setAllForOptions] = useState([]);
@@ -42,6 +41,12 @@ export default function InternshipsDashboard() {
     setFavorites(loadFavorites());
   }, []);
 
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/");
+    }
+  }, [status, router]);
+
   const fetchInternships = useCallback(async () => {
     setLoading(true);
     setError("");
@@ -51,20 +56,26 @@ export default function InternshipsDashboard() {
       if (field) params.set("field", field);
       if (deadlineFrom) params.set("deadlineFrom", deadlineFrom);
       if (deadlineTo) params.set("deadlineTo", deadlineTo);
+      
+      params.set("page", currentPage.toString());
+      params.set("limit", limit.toString());
 
       const res = await fetch(`/api/internships?${params.toString()}`, { cache: "no-store" });
       if (!res.ok) throw new Error(`API returned ${res.status}`);
       const data = await res.json();
+      
       setInternships(data.internships || []);
+      setTotalPages(data.totalPages || 1);
+      setTotalCount(data.totalCount || 0);
     } catch (e) {
       setError("Could not load internships. Is the dev server running?");
     } finally {
       setLoading(false);
     }
-  }, [country, field, deadlineFrom, deadlineTo]);
+  }, [country, field, deadlineFrom, deadlineTo, currentPage, limit]);
 
   useEffect(() => {
-    fetch("/api/internships", { cache: "no-store" })
+    fetch("/api/internships?limit=1000", { cache: "no-store" })
       .then((r) => r.json())
       .then((d) => setAllForOptions(d.internships || []))
       .catch(() => {});
@@ -104,7 +115,12 @@ export default function InternshipsDashboard() {
     setDeadlineFrom("");
     setDeadlineTo("");
     setFavoritesOnly(false);
+    setCurrentPage(1);
   }
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [country, field, deadlineFrom, deadlineTo]);
 
   if (status === "loading" || !session) {
     return <div className="min-h-screen flex items-center justify-center text-slate-500 font-bold">Loading...</div>;
@@ -112,12 +128,26 @@ export default function InternshipsDashboard() {
 
   return (
     <main className="mx-auto min-h-screen max-w-6xl px-4 py-8">
+      {/* New Centered Navbar */}
       <header className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-6 mb-8">
         <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition">
           <img src="/redolution-logo.png" alt="REDOLUTION" className="h-10 w-auto" />
         </Link>
+        
+        <div className="hidden md:flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
+          <Link href="/" className="text-sm font-semibold text-slate-600 hover:text-red-600 transition">
+            Home
+          </Link>
+          <a href="/#features" className="text-sm font-semibold text-slate-600 hover:text-red-600 transition">
+            Features
+          </a>
+          <a href="/#how-it-works" className="text-sm font-semibold text-slate-600 hover:text-red-600 transition">
+            How it works
+          </a>
+        </div>
+
         <div className="flex items-center gap-3">
-          <Link href="/internships" className="rounded-full bg-red-600 px-5 py-2 text-sm font-bold text-white shadow-sm hover:bg-red-700 transition">
+          <Link href="/internships" className="rounded-full bg-red-600 px-5 py-2 text-sm font-bold text-white shadow-sm hover:bg-red-700 transition ml-2">
             Internships
           </Link>
           <Link href="/dashboard" className="rounded-full border border-slate-300 bg-white px-5 py-2 text-sm font-bold text-slate-700 hover:text-red-600 transition">
@@ -176,7 +206,7 @@ export default function InternshipsDashboard() {
 
       <section className="mt-8">
         <p className="text-sm font-medium text-slate-500 mb-4">
-          {loading ? "Loading..." : `Showing ${visible.length} internship${visible.length === 1 ? "" : "s"}`}
+          {loading ? "Loading..." : `Showing ${visible.length} of ${totalCount} internships`}
         </p>
 
         {error && <p className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">{error}</p>}
@@ -222,6 +252,43 @@ export default function InternshipsDashboard() {
             );
           })}
         </div>
+
+        {totalPages > 1 && !favoritesOnly && (
+          <div className="mt-12 flex items-center justify-center gap-2">
+            <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition">
+              Previous
+            </button>
+            
+            <div className="flex items-center gap-1">
+              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                let pageNum;
+                if (totalPages <= 5) pageNum = i + 1;
+                else if (currentPage <= 3) pageNum = i + 1;
+                else if (currentPage >= totalPages - 2) pageNum = totalPages - 4 + i;
+                else pageNum = currentPage - 2 + i;
+
+                return (
+                  <button key={pageNum} onClick={() => setCurrentPage(pageNum)} className={`h-10 w-10 rounded-lg text-sm font-bold transition ${currentPage === pageNum ? "bg-red-600 text-white shadow-md" : "bg-white text-slate-700 border border-slate-300 hover:bg-slate-50"}`}>
+                    {pageNum}
+                  </button>
+                );
+              })}
+              
+              {totalPages > 5 && currentPage < totalPages - 2 && (
+                <>
+                  <span className="text-slate-400">...</span>
+                  <button onClick={() => setCurrentPage(totalPages)} className="h-10 w-10 rounded-lg text-sm font-bold bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 transition">
+                    {totalPages}
+                  </button>
+                </>
+              )}
+            </div>
+
+            <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition">
+              Next
+            </button>
+          </div>
+        )}
       </section>
     </main>
   );

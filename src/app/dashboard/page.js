@@ -11,7 +11,6 @@ export default function Dashboard() {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Form state
   const [jobTitle, setJobTitle] = useState("");
   const [company, setCompany] = useState("");
   const [statusValue, setStatusValue] = useState("Applied");
@@ -68,12 +67,26 @@ export default function Dashboard() {
 
   return (
     <main className="mx-auto min-h-screen max-w-6xl px-4 py-8">
+      {/* New Centered Navbar */}
       <header className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-6 mb-8">
         <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition">
           <img src="/redolution-logo.png" alt="REDOLUTION" className="h-10 w-auto" />
         </Link>
+        
+        <div className="hidden md:flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
+          <Link href="/" className="text-sm font-semibold text-slate-600 hover:text-red-600 transition">
+            Home
+          </Link>
+          <a href="/#features" className="text-sm font-semibold text-slate-600 hover:text-red-600 transition">
+            Features
+          </a>
+          <a href="/#how-it-works" className="text-sm font-semibold text-slate-600 hover:text-red-600 transition">
+            How it works
+          </a>
+        </div>
+
         <div className="flex items-center gap-3">
-          <Link href="/internships" className="rounded-full bg-red-600 px-5 py-2 text-sm font-bold text-white shadow-sm hover:bg-red-700 transition">
+          <Link href="/internships" className="rounded-full bg-red-600 px-5 py-2 text-sm font-bold text-white shadow-sm hover:bg-red-700 transition ml-2">
             Internships
           </Link>
           <Link href="/dashboard" className="rounded-full border border-slate-300 bg-white px-5 py-2 text-sm font-bold text-slate-700 hover:text-red-600 transition">
@@ -91,7 +104,6 @@ export default function Dashboard() {
       </div>
 
       <div className="grid lg:grid-cols-3 gap-8">
-        {/* Add Application Form */}
         <div className="lg:col-span-1">
           <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <h2 className="text-lg font-bold text-slate-900 mb-4">Log a New Application</h2>
@@ -120,7 +132,6 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Applications List */}
         <div className="lg:col-span-2">
           <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
             <div className="px-6 py-4 border-b border-slate-200 bg-slate-50">
