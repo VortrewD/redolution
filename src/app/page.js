@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useSession, signIn } from "next-auth/react";
 import { useState, useEffect } from "react";
+import FloatingLetters from "./components/FloatingLetters";
 
 export default function Home() {
   const { data: session } = useSession();
@@ -16,7 +17,10 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-red-200">
+    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-red-200 relative overflow-hidden">
+      
+      {/* THE NEW ARTISTIC BACKGROUND */}
+      <FloatingLetters />
       
       {/* --- NAVBAR --- */}
       <nav className="fixed top-0 w-full z-50 border-b border-slate-200/50 bg-white/70 backdrop-blur-xl">
@@ -24,12 +28,10 @@ export default function Home() {
           <Link href="/" className="flex items-center gap-2">
             <img src="/redolution-logo.png" alt="REDOLUTION" className="h-8 w-auto" />
           </Link>
-          
-          <div className="hidden md:flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
+          <div className="hidden md:flex items-center gap-8">
             <a href="#features" className="text-sm font-medium text-slate-600 hover:text-slate-900 transition">Features</a>
             <a href="#how-it-works" className="text-sm font-medium text-slate-600 hover:text-slate-900 transition">How it works</a>
           </div>
-
           <div className="flex items-center gap-4">
             {session ? (
               <>
@@ -53,8 +55,8 @@ export default function Home() {
       </nav>
 
       {/* --- HERO SECTION --- */}
-      <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-40"></div>
+      <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden z-10">
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-40 pointer-events-none"></div>
         
         <div className="absolute top-0 right-0 -translate-y-12 translate-x-1/3 w-[40rem] h-[40rem] bg-red-100 rounded-full blur-[100px] opacity-60 pointer-events-none"></div>
         <div className="absolute bottom-0 left-0 translate-y-1/3 -translate-x-1/3 w-[30rem] h-[30rem] bg-red-50 rounded-full blur-[80px] opacity-60 pointer-events-none"></div>
@@ -128,7 +130,7 @@ export default function Home() {
       </section>
 
       {/* --- FEATURED INTERNSHIPS --- */}
-      <section className="py-12 bg-white border-t border-slate-100">
+      <section className="py-12 bg-white/80 backdrop-blur-md border-t border-slate-100 relative z-10">
         <div className="mx-auto max-w-7xl px-6">
           <div className="flex items-end justify-between mb-8">
             <div>
@@ -144,7 +146,7 @@ export default function Home() {
             {featuredJobs.map((job) => (
               <div 
                 key={job.id} 
-                className="rounded-2xl border border-slate-200 bg-slate-50/50 p-6 shadow-sm hover:shadow-md transition group cursor-pointer" 
+                className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition group cursor-pointer" 
                 onClick={() => {
                   if (session) {
                     window.location.href = "/internships";
@@ -158,13 +160,13 @@ export default function Home() {
                     <h3 className="font-bold text-slate-900 leading-tight group-hover:text-red-600 transition">{job.title}</h3>
                     <p className="text-sm font-medium text-slate-500 mt-1">{job.company}</p>
                   </div>
-                  <div className="shrink-0 h-8 w-8 rounded-full bg-white border border-slate-200 flex items-center justify-center text-xs shadow-sm">
+                  <div className="shrink-0 h-8 w-8 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center text-xs shadow-sm">
                     {session ? "→" : "🔒"}
                   </div>
                 </div>
                 <div className="flex flex-wrap gap-2 text-xs font-medium">
-                  <span className="rounded-md bg-white px-2 py-1 text-slate-600 border border-slate-200">📍 {job.country}</span>
-                  <span className="rounded-md bg-white px-2 py-1 text-slate-600 border border-slate-200">💼 {job.field}</span>
+                  <span className="rounded-md bg-slate-50 px-2 py-1 text-slate-600 border border-slate-200">📍 {job.country}</span>
+                  <span className="rounded-md bg-slate-50 px-2 py-1 text-slate-600 border border-slate-200">💼 {job.field}</span>
                 </div>
                 <div className="mt-6 text-sm font-bold text-red-600 flex items-center gap-1 group-hover:gap-2 transition-all">
                   {session ? "View all internships" : "Sign in to view details"}
@@ -177,7 +179,7 @@ export default function Home() {
       </section>
 
       {/* --- LOGO CLOUD --- */}
-      <section className="border-y border-slate-200/60 bg-white/50 backdrop-blur-sm py-8">
+      <section className="border-y border-slate-200/60 bg-white/50 backdrop-blur-sm py-8 relative z-10">
         <div className="mx-auto max-w-7xl px-6">
           <p className="text-center text-xs font-bold uppercase tracking-widest text-slate-400 mb-6">Aggregating internships from</p>
           <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
@@ -191,7 +193,7 @@ export default function Home() {
       </section>
 
       {/* --- HOW IT WORKS --- */}
-      <section id="how-it-works" className="py-24 bg-white relative">
+      <section id="how-it-works" className="py-24 bg-white/80 backdrop-blur-md relative z-10">
         <div className="mx-auto max-w-7xl px-6">
           <div className="text-center max-w-2xl mx-auto mb-16">
             <h2 className="text-3xl md:text-4xl font-black text-slate-900">Your unfair advantage in the internship hunt.</h2>
@@ -219,7 +221,7 @@ export default function Home() {
       </section>
 
       {/* --- BENTO FEATURES --- */}
-      <section id="features" className="py-24 bg-slate-50 border-t border-slate-200/60">
+      <section id="features" className="py-24 bg-slate-50/80 backdrop-blur-md border-t border-slate-200/60 relative z-10">
         <div className="mx-auto max-w-7xl px-6">
           <div className="mb-16">
             <h2 className="text-3xl md:text-4xl font-black text-slate-900">Everything you need to get hired.</h2>
@@ -251,7 +253,7 @@ export default function Home() {
       </section>
 
       {/* --- FOOTER --- */}
-      <footer className="bg-white border-t border-slate-200 py-12">
+      <footer className="bg-white py-12 relative z-10">
         <div className="mx-auto max-w-7xl px-6 flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-2">
             <img src="/redolution-logo.png" alt="REDOLUTION" className="h-6 w-auto grayscale opacity-50" />
