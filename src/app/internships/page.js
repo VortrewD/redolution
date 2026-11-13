@@ -128,8 +128,8 @@ export default function InternshipsDashboard() {
 
   return (
     <main className="mx-auto min-h-screen max-w-6xl px-4 py-8">
-      {/* New Centered Navbar */}
-      <header className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-6 mb-8">
+      {/* Centered Navbar */}
+      <header className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-6 mb-8 relative">
         <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition">
           <img src="/redolution-logo.png" alt="REDOLUTION" className="h-10 w-auto" />
         </Link>
@@ -230,9 +230,30 @@ export default function InternshipsDashboard() {
                       <h2 className="text-lg font-bold text-slate-900 leading-tight">{job.title}</h2>
                       <p className="text-sm font-medium text-slate-600 mt-1">{job.company}</p>
                     </div>
-                    <button onClick={() => toggleFavorite(job.id)} className={`shrink-0 rounded-full border px-2 py-1 text-xs font-bold transition ${isFav ? "border-red-200 bg-red-50 text-red-600" : "border-slate-200 bg-white text-slate-400 hover:bg-slate-50"}`}>
-                      {isFav ? "★ Saved" : "☆ Save"}
-                    </button>
+                    <div className="flex gap-2">
+                      <button 
+                        onClick={async () => {
+                          const res = await fetch("/api/applications", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                              job_title: job.title,
+                              company: job.company,
+                              status: "Applied",
+                              date_applied: new Date().toISOString().split("T")[0]
+                            }),
+                          });
+                          if (res.ok) alert("Application tracked in your Dashboard!");
+                        }} 
+                        className="shrink-0 rounded-full border border-slate-200 bg-white px-2 py-1 text-xs font-bold text-slate-500 hover:text-red-600 hover:border-red-200 transition"
+                        title="Track Application"
+                      >
+                        + Track
+                      </button>
+                      <button onClick={() => toggleFavorite(job.id)} className={`shrink-0 rounded-full border px-2 py-1 text-xs font-bold transition ${isFav ? "border-red-200 bg-red-50 text-red-600" : "border-slate-200 bg-white text-slate-400 hover:bg-slate-50"}`}>
+                        {isFav ? "★ Saved" : "☆ Save"}
+                      </button>
+                    </div>
                   </div>
                   <div className="mt-4 flex flex-wrap gap-2 text-xs font-medium">
                     <span className="rounded-md bg-slate-100 px-2 py-1 text-slate-600">📍 {job.country}</span>
@@ -245,7 +266,24 @@ export default function InternshipsDashboard() {
                     ))}
                   </div>
                 </div>
-                <a href={isFakeLink ? `https://www.google.com/search?q=${encodeURIComponent(job.title + " " + job.company)}` : job.url} target="_blank" rel="noreferrer" className="mt-5 block w-full rounded-lg bg-red-600 px-4 py-2 text-center text-sm font-bold text-white hover:bg-red-700 transition">
+                <a 
+                  href={isFakeLink ? `https://www.google.com/search?q=${encodeURIComponent(job.title + " " + job.company)}` : job.url} 
+                  target="_blank" 
+                  rel="noreferrer" 
+                  onClick={async () => {
+                    await fetch("/api/applications", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                        job_title: job.title,
+                        company: job.company,
+                        status: "Applied",
+                        date_applied: new Date().toISOString().split("T")[0]
+                      }),
+                    });
+                  }}
+                  className="mt-5 block w-full rounded-lg bg-red-600 px-4 py-2 text-center text-sm font-bold text-white hover:bg-red-700 transition"
+                >
                   {isFakeLink ? "Search on Google ↗" : "View / Apply →"}
                 </a>
               </article>
