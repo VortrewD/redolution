@@ -18,6 +18,7 @@ export async function GET(request) {
     });
 
     const { searchParams } = new URL(request.url);
+    const search = searchParams.get("search") || "";
     const country = searchParams.get("country") || "";
     const field = searchParams.get("field") || "";
     const deadlineFrom = searchParams.get("deadlineFrom") || "";
@@ -30,6 +31,12 @@ export async function GET(request) {
 
     const where = [];
     const args = [];
+
+    // Add search logic (searches in title and company)
+    if (search) {
+      where.push("(title LIKE ? OR company LIKE ?)");
+      args.push(`%${search}%`, `%${search}%`);
+    }
 
     if (country) { where.push("country = ?"); args.push(country); }
     if (field) { where.push("field = ?"); args.push(field); }
@@ -44,7 +51,6 @@ export async function GET(request) {
       args: args
     });
     
-    // CRITICAL FIX: Convert BigInt to standard Number so JSON can parse it
     const totalCount = Number(countResult.rows[0].count);
 
     // Get the paginated data

@@ -30,9 +30,9 @@ export default function InternshipsDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   
-  // State for our custom toast notification
   const [toastMessage, setToastMessage] = useState("");
 
+  const [search, setSearch] = useState("");
   const [country, setCountry] = useState("");
   const [field, setField] = useState("");
   const [deadlineFrom, setDeadlineFrom] = useState("");
@@ -56,6 +56,7 @@ export default function InternshipsDashboard() {
     setError("");
     try {
       const params = new URLSearchParams();
+      if (search) params.set("search", search);
       if (country) params.set("country", country);
       if (field) params.set("field", field);
       if (deadlineFrom) params.set("deadlineFrom", deadlineFrom);
@@ -76,7 +77,7 @@ export default function InternshipsDashboard() {
     } finally {
       setLoading(false);
     }
-  }, [country, field, deadlineFrom, deadlineTo, currentPage, limit]);
+  }, [search, country, field, deadlineFrom, deadlineTo, currentPage, limit]);
 
   useEffect(() => {
     fetch("/api/internships?limit=1000", { cache: "no-store" })
@@ -114,6 +115,7 @@ export default function InternshipsDashboard() {
   }
 
   function clearFilters() {
+    setSearch("");
     setCountry("");
     setField("");
     setDeadlineFrom("");
@@ -124,7 +126,7 @@ export default function InternshipsDashboard() {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [country, field, deadlineFrom, deadlineTo]);
+  }, [search, country, field, deadlineFrom, deadlineTo]);
 
   const showToast = (msg) => {
     setToastMessage(msg);
@@ -138,7 +140,6 @@ export default function InternshipsDashboard() {
   return (
     <main className="mx-auto min-h-screen max-w-6xl px-4 py-8 relative">
       
-      {/* Sleek Toast Notification */}
       <AnimatePresence>
         {toastMessage && (
           <motion.div
@@ -189,6 +190,22 @@ export default function InternshipsDashboard() {
       </div>
 
       <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        {/* NEW SEARCH BAR */}
+        <div className="mb-4">
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
+              <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+            </div>
+            <input 
+              type="text" 
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search by job title or company (e.g., React, Stripe, Marketing)..." 
+              className="w-full rounded-xl border border-slate-300 pl-11 pr-4 py-3 text-sm focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none shadow-sm"
+            />
+          </div>
+        </div>
+
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           <label className="block">
             <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Country</span>
@@ -237,7 +254,6 @@ export default function InternshipsDashboard() {
           </p>
         )}
 
-        {/* Animated Grid */}
         <motion.div layout className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
           <AnimatePresence mode="popLayout">
             {visible.map((job) => {
