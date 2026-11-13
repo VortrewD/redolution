@@ -12,11 +12,9 @@ export default function Dashboard() {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // State for the internship dropdown
   const [allInternships, setAllInternships] = useState([]);
   const [selectedJobId, setSelectedJobId] = useState("");
 
-  // Form state
   const [jobTitle, setJobTitle] = useState("");
   const [company, setCompany] = useState("");
   const [statusValue, setStatusValue] = useState("Applied");
@@ -25,7 +23,6 @@ export default function Dashboard() {
     if (status === "unauthenticated") router.push("/");
   }, [status, router]);
 
-  // Fetch user's applications
   const fetchApplications = async () => {
     if (!session) return;
     const res = await fetch("/api/applications", { cache: "no-store" });
@@ -36,7 +33,6 @@ export default function Dashboard() {
     setLoading(false);
   };
 
-  // Fetch all internships for the dropdown (we fetch a large limit to get them all)
   const fetchInternships = async () => {
     if (!session) return;
     const res = await fetch("/api/internships?limit=3000", { cache: "no-store" });
@@ -53,7 +49,6 @@ export default function Dashboard() {
     }
   }, [session]);
 
-  // Handle dropdown selection
   const handleSelectJob = (e) => {
     const id = e.target.value;
     setSelectedJobId(id);
@@ -112,16 +107,14 @@ export default function Dashboard() {
         
         <div className="hidden md:flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
           <Link href="/" className="text-sm font-semibold text-slate-600 hover:text-red-600 transition">Home</Link>
-          <a href="/#features" className="text-sm font-semibold text-slate-600 hover:text-red-600 transition">Features</a>
-          <a href="/#how-it-works" className="text-sm font-semibold text-slate-600 hover:text-red-600 transition">How it works</a>
+          <Link href="/internships" className="text-sm font-semibold text-slate-600 hover:text-red-600 transition">Internships</Link>
+          <Link href="/dashboard" className="text-sm font-semibold text-slate-600 hover:text-red-600 transition">Dashboard</Link>
+          <Link href="/profile" className="text-sm font-semibold text-slate-600 hover:text-red-600 transition">Profile</Link>
         </div>
 
         <div className="flex items-center gap-3">
-          <Link href="/internships" className="rounded-full bg-red-600 px-5 py-2 text-sm font-bold text-white shadow-sm hover:bg-red-700 transition ml-2">
-            Internships
-          </Link>
-          <Link href="/dashboard" className="rounded-full border border-slate-300 bg-white px-5 py-2 text-sm font-bold text-slate-700 hover:text-red-600 transition">
-            Dashboard
+          <Link href="/profile" className="rounded-full bg-red-600 px-5 py-2 text-sm font-bold text-white shadow-sm hover:bg-red-700 transition ml-2">
+            Profile
           </Link>
           <button onClick={() => signOut({ callbackUrl: "/" })} className="text-sm font-semibold text-slate-500 hover:text-red-600 transition ml-2">
             Sign out
@@ -135,13 +128,11 @@ export default function Dashboard() {
       </div>
 
       <div className="grid lg:grid-cols-3 gap-8">
-        {/* Add Application Form */}
         <div className="lg:col-span-1">
           <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <h2 className="text-lg font-bold text-slate-900 mb-4">Log a New Application</h2>
             <form onSubmit={handleAddApplication} className="space-y-4">
               
-              {/* NEW DROPDOWN */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Select Internship (Optional)</label>
                 <select value={selectedJobId} onChange={handleSelectJob} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none mb-4 bg-slate-50">
@@ -178,7 +169,6 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Applications List */}
         <div className="lg:col-span-2">
           <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
             <div className="px-6 py-4 border-b border-slate-200 bg-slate-50">
