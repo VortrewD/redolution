@@ -1,10 +1,19 @@
 import { createClient } from "@libsql/client";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "../auth/[...nextauth]/route";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function GET(request) {
   try {
+    // 1. Check if user is logged in
+    const session = await getServerSession(authOptions);
+    if (!session) {
+      return Response.json({ error: "Unauthorized. Please sign in." }, { status: 401 });
+    }
+
+    // 2. Connect to Database
     const db = createClient({
       url: process.env.TURSO_DATABASE_URL,
       authToken: process.env.TURSO_AUTH_TOKEN,
