@@ -7,13 +7,11 @@ export const dynamic = "force-dynamic";
 
 export async function GET(request) {
   try {
-    // 1. Check if user is logged in
     const session = await getServerSession(authOptions);
     if (!session) {
-      return Response.json({ error: "Unauthorized. Please sign in." }, { status: 401 });
+      return Response.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // 2. Connect to Database
     const db = createClient({
       url: process.env.TURSO_DATABASE_URL,
       authToken: process.env.TURSO_AUTH_TOKEN,
@@ -24,6 +22,11 @@ export async function GET(request) {
     const field = searchParams.get("field") || "";
     const deadlineFrom = searchParams.get("deadlineFrom") || "";
     const deadlineTo = searchParams.get("deadlineTo") || "";
+    
+    // Pagination params
+    const page = parseInt(searchParams.get("page") || "1");
+    const limit = parseInt(searchParams.get("limit") || "12");
+    const offset = (page - 1) * limit;
 
     const where = [];
     const args = [];
@@ -33,12 +36,27 @@ export async function GET(request) {
     if (deadlineFrom) { where.push("deadline >= ?"); args.push(deadlineFrom); }
     if (deadlineTo) { where.push("deadline <= ?"); args.push(deadlineTo); }
 
-    const sql =
-      "SELECT id, title, company, country, field, deadline, docs, url FROM internships" +
-      (where.length ? ` WHERE ${where.join(" AND ")}` : "") +
-      " ORDER BY deadline ASC";
+    const whereClause = where.length ? ` WHERE ${where.join(" AND ")}` : "";
 
-    const result = await db.execute({ sql, args });
+    // Get total count for pagination
+    const countResult = await db.execute({
+      sql: `SELECT COUNT(*) as count FROM internships${whereClause}`,
+      args: args
+    });
+    
+    // CRITICAL FIX: Convert BigInt to standard Number so JSON can parse it
+    const totalCount = Number(countResult.rows[0].count);
+
+    // Get the paginated data
+    const sql = `SELECT id, title, company, country, field, deadline, docs, url 
+                 FROM internships${whereClause} 
+                 ORDER BY id DESC 
+                 LIMIT ? OFFSET ?`;
+    
+    const result = await db.execute({
+      sql: sql,
+      args: [...args, limit, offset]
+    });
 
     const internships = result.rows.map((row) => {
       let docs = [];
@@ -50,7 +68,12 @@ export async function GET(request) {
       return { ...row, docs };
     });
 
-    return Response.json({ internships });
+    return Response.json({ 
+      internships, 
+      totalCount, 
+      totalPages: Math.ceil(totalCount / limit),
+      currentPage: page 
+    });
   } catch (error) {
     console.error("Database error:", error);
     return Response.json({ error: error.message }, { status: 500 });
