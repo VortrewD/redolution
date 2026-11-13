@@ -1,8 +1,7 @@
 import "./globals.css";
 import Providers from "./providers";
+import { AppProvider } from "./context/AppContext";
 
-// Change this when you deploy: set NEXT_PUBLIC_SITE_URL in .env.local
-// to your real domain, e.g., https://redolution.com
 const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL || "https://redolution.example.com";
 
@@ -14,29 +13,13 @@ export const metadata = {
   },
   description:
     "REDOLUTION aggregates internships for students. Filter by country, field and deadline, save favourites, and find software, data / AI, cybersecurity, web and mobile internships in Morocco, France, Germany, Lithuania and more.",
-  keywords: [
-    "internships",
-    "internship Morocco",
-    "stage Maroc",
-    "software engineering internship",
-    "data science internship",
-    "AI internship",
-    "cybersecurity internship",
-    "web development internship",
-    "REDOLUTION",
-  ],
+  keywords: ["internships", "internship Morocco", "stage Maroc", "REDOLUTION"],
   authors: [{ name: "REDOLUTION" }],
   creator: "REDOLUTION",
   publisher: "REDOLUTION",
   robots: {
     index: true,
     follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      "max-image-preview": "large",
-      "max-snippet": -1,
-    },
   },
   alternates: {
     canonical: siteUrl,
@@ -47,22 +30,12 @@ export const metadata = {
     url: siteUrl,
     siteName: "REDOLUTION",
     title: "REDOLUTION — Find Internships in Morocco & Abroad",
-    description:
-      "Filter internships by country, field and deadline, save favourites, and find your next software, data / AI or cybersecurity internship.",
-    images: [
-      {
-        url: "/redolution-logo.png",
-        width: 1376,
-        height: 768,
-        alt: "REDOLUTION logo",
-      },
-    ],
+    description: "Filter internships by country, field and deadline.",
+    images: [{ url: "/redolution-logo.png", width: 1376, height: 768 }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "REDOLUTION — Find Internships in Morocco & Abroad",
-    description:
-      "Filter internships by country, field and deadline, save favourites, and find your next internship.",
+    title: "REDOLUTION — Find Internships",
     images: ["/redolution-logo.png"],
   },
   icons: {
@@ -71,7 +44,6 @@ export const metadata = {
   },
 };
 
-// Structured data: Organisation + WebSite, using the logo you supplied.
 const jsonLd = {
   "@context": "https://schema.org",
   "@graph": [
@@ -85,8 +57,6 @@ const jsonLd = {
       "@type": "WebSite",
       name: "REDOLUTION",
       url: siteUrl,
-      description:
-        "Internship aggregation dashboard: filter internships by country, field and deadline.",
       inLanguage: "en",
     },
   ],
@@ -94,14 +64,16 @@ const jsonLd = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body>
         <Providers>
-          <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-          />
-          {children}
+          <AppProvider>
+            <script
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+            />
+            {children}
+          </AppProvider>
         </Providers>
       </body>
     </html>
