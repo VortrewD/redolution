@@ -1,8 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { signIn, signOut, useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const FAVORITES_KEY = "redolution:favorites";
 
@@ -15,7 +16,15 @@ function loadFavorites() {
 }
 
 export default function InternshipsDashboard() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
+  const router = useRouter();
+
+  // Route Protection
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/");
+    }
+  }, [status, router]);
 
   const [internships, setInternships] = useState([]);
   const [allForOptions, setAllForOptions] = useState([]);
@@ -98,6 +107,10 @@ export default function InternshipsDashboard() {
     setFavoritesOnly(false);
   }
 
+  if (status === "loading" || !session) {
+    return <div className="min-h-screen flex items-center justify-center text-slate-500 font-bold">Loading...</div>;
+  }
+
   return (
     <main className="mx-auto min-h-screen max-w-6xl px-4 py-8">
       <header className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-6 mb-8">
@@ -105,18 +118,15 @@ export default function InternshipsDashboard() {
           <img src="/redolution-logo.png" alt="REDOLUTION" className="h-10 w-auto" />
         </Link>
         <div className="flex items-center gap-4">
-          <Link href="/" className="text-sm font-semibold text-slate-600 hover:text-red-600">
-            Home
+          <Link href="/internships" className="text-sm font-bold text-red-600">
+            Internships
           </Link>
-          {session ? (
-            <button onClick={() => signOut()} className="text-sm font-semibold text-slate-600 hover:text-red-600">
-              Sign out
-            </button>
-          ) : (
-            <button onClick={() => signIn("google")} className="rounded-full bg-red-600 px-5 py-2 text-sm font-bold text-white shadow-md hover:bg-red-700 transition">
-              Sign In
-            </button>
-          )}
+          <Link href="/dashboard" className="text-sm font-semibold text-slate-600 hover:text-red-600">
+            Dashboard
+          </Link>
+          <button onClick={() => signOut({ callbackUrl: "/" })} className="text-sm font-semibold text-slate-600 hover:text-red-600">
+            Sign out
+          </button>
         </div>
       </header>
 

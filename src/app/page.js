@@ -21,9 +21,14 @@ export default function Home() {
           </div>
           <div className="flex items-center gap-4">
             {session ? (
-              <Link href="/internships" className="rounded-full bg-red-600 px-5 py-2.5 text-sm font-bold text-white shadow-md hover:bg-red-700 hover:shadow-lg transition-all active:scale-95">
-                Dashboard
-              </Link>
+              <>
+                <Link href="/internships" className="rounded-full border border-slate-200 bg-white px-5 py-2.5 text-sm font-bold text-slate-700 shadow-sm hover:bg-slate-50 transition-all active:scale-95">
+                  Internships
+                </Link>
+                <Link href="/dashboard" className="rounded-full bg-red-600 px-5 py-2.5 text-sm font-bold text-white shadow-md hover:bg-red-700 hover:shadow-lg transition-all active:scale-95">
+                  Dashboard
+                </Link>
+              </>
             ) : (
               <>
                 <button onClick={() => signIn("google")} className="text-sm font-medium text-slate-600 hover:text-slate-900 transition">
