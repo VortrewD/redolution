@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import FloatingLetters from "../components/FloatingLetters";
 
 export default function Profile() {
   const { data: session, status } = useSession();
@@ -87,9 +88,10 @@ export default function Profile() {
   }
 
   return (
-    <main className="mx-auto min-h-screen max-w-4xl px-4 py-8 bg-slate-50 text-slate-900">
+    <main className="mx-auto min-h-screen max-w-4xl px-4 py-8 relative bg-slate-50 text-slate-900 overflow-hidden">
+      <FloatingLetters />
       
-      <header className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-6 mb-8 relative">
+      <header className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-6 mb-8 relative z-10">
         <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition">
           <img src="/redolution-logo.png" alt="REDOLUTION" className="h-10 w-auto" />
         </Link>
@@ -102,29 +104,24 @@ export default function Profile() {
         </div>
 
         <div className="flex items-center gap-3">
-          <select className="px-3 py-1.5 rounded-lg border border-slate-300 bg-white font-bold text-sm outline-none cursor-pointer">
-            <option value="en">🇬🇧 EN</option>
-            <option value="fr">🇫🇷 FR</option>
-            <option value="ar">🇲🇦 AR</option>
-          </select>
           <button onClick={() => signOut({ callbackUrl: "/" })} className="text-sm font-semibold text-slate-500 hover:text-red-600 transition ml-2">
             Sign out
           </button>
         </div>
       </header>
 
-      <div className="mb-8 relative">
+      <div className="mb-8 relative z-10">
         <h1 className="text-3xl font-black tracking-tight">Your Profile</h1>
         <p className="mt-2 text-slate-600">Set your preferences, upload your CV, and manage email alerts.</p>
       </div>
 
       {message && (
-        <div className="mb-6 rounded-lg bg-green-50 p-4 border border-green-200 text-green-800 font-medium relative">
+        <div className="mb-6 rounded-lg bg-green-50 p-4 border border-green-200 text-green-800 font-medium relative z-10">
           {message}
         </div>
       )}
 
-      <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm space-y-8 relative">
+      <div className="rounded-2xl border border-slate-200 bg-white/80 backdrop-blur-md p-8 shadow-sm space-y-8 relative z-10">
         
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-200">
           <div>
