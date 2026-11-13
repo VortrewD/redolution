@@ -19,7 +19,6 @@ export default function InternshipsDashboard() {
   const { data: session, status } = useSession();
   const router = useRouter();
 
-  // Route Protection
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/");
@@ -117,14 +116,14 @@ export default function InternshipsDashboard() {
         <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition">
           <img src="/redolution-logo.png" alt="REDOLUTION" className="h-10 w-auto" />
         </Link>
-        <div className="flex items-center gap-4">
-          <Link href="/internships" className="text-sm font-bold text-red-600">
+        <div className="flex items-center gap-3">
+          <Link href="/internships" className="rounded-full bg-red-600 px-5 py-2 text-sm font-bold text-white shadow-sm hover:bg-red-700 transition">
             Internships
           </Link>
-          <Link href="/dashboard" className="text-sm font-semibold text-slate-600 hover:text-red-600">
+          <Link href="/dashboard" className="rounded-full border border-slate-300 bg-white px-5 py-2 text-sm font-bold text-slate-700 hover:text-red-600 transition">
             Dashboard
           </Link>
-          <button onClick={() => signOut({ callbackUrl: "/" })} className="text-sm font-semibold text-slate-600 hover:text-red-600">
+          <button onClick={() => signOut({ callbackUrl: "/" })} className="text-sm font-semibold text-slate-500 hover:text-red-600 transition ml-2">
             Sign out
           </button>
         </div>
