@@ -12,6 +12,8 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
+  
+  const [isSubscribed, setIsSubscribed] = useState(false);
 
   const [profile, setProfile] = useState({
     full_name: "",
@@ -73,6 +75,16 @@ export default function Profile() {
     setSaving(false);
   };
 
+  const handleSubscribe = async () => {
+    const method = isSubscribed ? "DELETE" : "POST";
+    const res = await fetch("/api/subscribe", { method });
+    if (res.ok) {
+      setIsSubscribed(!isSubscribed);
+      setMessage(isSubscribed ? "Unsubscribed from daily emails." : "You are now subscribed to daily emails!");
+      setTimeout(() => setMessage(""), 3000);
+    }
+  };
+
   if (status === "loading" || !session || loading) {
     return <div className="min-h-screen flex items-center justify-center text-slate-500 font-bold">Loading...</div>;
   }
@@ -88,6 +100,7 @@ export default function Profile() {
           <Link href="/" className="text-sm font-semibold text-slate-600 hover:text-red-600 transition">Home</Link>
           <Link href="/internships" className="text-sm font-semibold text-slate-600 hover:text-red-600 transition">Internships</Link>
           <Link href="/dashboard" className="text-sm font-semibold text-slate-600 hover:text-red-600 transition">Dashboard</Link>
+          <Link href="/profile" className="text-sm font-semibold text-red-600 transition">Profile</Link>
         </div>
 
         <div className="flex items-center gap-3">
@@ -102,7 +115,7 @@ export default function Profile() {
 
       <div className="mb-8">
         <h1 className="text-3xl font-black tracking-tight text-slate-900">Your Profile</h1>
-        <p className="mt-2 text-slate-600">Set your preferences and upload your CV.</p>
+        <p className="mt-2 text-slate-600">Set your preferences, upload your CV, and manage email alerts.</p>
       </div>
 
       {message && (
@@ -111,7 +124,28 @@ export default function Profile() {
         </div>
       )}
 
-      <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+      <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm space-y-8">
+        
+        {/* EMAIL ALERTS SECTION */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-200">
+          <div>
+            <h3 className="text-lg font-bold text-slate-900">Daily Email Alerts</h3>
+            <p className="text-sm text-slate-500 mt-1">Get a daily summary of the newest internships sent to your inbox.</p>
+          </div>
+          <button 
+            type="button" 
+            onClick={handleSubscribe} 
+            className={`mt-4 sm:mt-0 px-5 py-2.5 text-sm font-bold rounded-lg transition ${
+              isSubscribed 
+                ? 'bg-slate-200 text-slate-700 hover:bg-slate-300' 
+                : 'bg-red-600 text-white hover:bg-red-700 shadow-md'
+            }`}
+          >
+            {isSubscribed ? "Unsubscribe" : "Subscribe"}
+          </button>
+        </div>
+
+        {/* PROFILE FORM */}
         <form onSubmit={handleSave} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
