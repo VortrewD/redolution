@@ -166,8 +166,9 @@ export default function InternshipsDashboard() {
         
         <div className="hidden md:flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
           <Link href="/" className="text-sm font-semibold text-slate-600 hover:text-red-600 transition">Home</Link>
-          <a href="/#features" className="text-sm font-semibold text-slate-600 hover:text-red-600 transition">Features</a>
-          <a href="/#how-it-works" className="text-sm font-semibold text-slate-600 hover:text-red-600 transition">How it works</a>
+          <Link href="/internships" className="text-sm font-semibold text-slate-600 hover:text-red-600 transition">Internships</Link>
+          <Link href="/dashboard" className="text-sm font-semibold text-slate-600 hover:text-red-600 transition">Dashboard</Link>
+          <Link href="/profile" className="text-sm font-semibold text-slate-600 hover:text-red-600 transition">Profile</Link>
         </div>
 
         <div className="flex items-center gap-3">
