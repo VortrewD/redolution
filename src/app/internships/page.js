@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
 
 const FAVORITES_KEY = "redolution:favorites";
 
@@ -28,6 +29,9 @@ export default function InternshipsDashboard() {
   const [allForOptions, setAllForOptions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  
+  // State for our custom toast notification
+  const [toastMessage, setToastMessage] = useState("");
 
   const [country, setCountry] = useState("");
   const [field, setField] = useState("");
@@ -122,28 +126,44 @@ export default function InternshipsDashboard() {
     setCurrentPage(1);
   }, [country, field, deadlineFrom, deadlineTo]);
 
+  const showToast = (msg) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(""), 3000);
+  };
+
   if (status === "loading" || !session) {
     return <div className="min-h-screen flex items-center justify-center text-slate-500 font-bold">Loading...</div>;
   }
 
   return (
-    <main className="mx-auto min-h-screen max-w-6xl px-4 py-8">
-      {/* Centered Navbar */}
+    <main className="mx-auto min-h-screen max-w-6xl px-4 py-8 relative">
+      
+      {/* Sleek Toast Notification */}
+      <AnimatePresence>
+        {toastMessage && (
+          <motion.div
+            initial={{ opacity: 0, y: 50, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+            className="fixed bottom-8 right-8 z-50 flex items-center gap-3 rounded-2xl bg-slate-900 px-6 py-4 text-white shadow-2xl"
+          >
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-500/20 text-green-400">
+              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+            </div>
+            <span className="font-medium text-sm">{toastMessage}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <header className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-6 mb-8 relative">
         <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition">
           <img src="/redolution-logo.png" alt="REDOLUTION" className="h-10 w-auto" />
         </Link>
         
         <div className="hidden md:flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
-          <Link href="/" className="text-sm font-semibold text-slate-600 hover:text-red-600 transition">
-            Home
-          </Link>
-          <a href="/#features" className="text-sm font-semibold text-slate-600 hover:text-red-600 transition">
-            Features
-          </a>
-          <a href="/#how-it-works" className="text-sm font-semibold text-slate-600 hover:text-red-600 transition">
-            How it works
-          </a>
+          <Link href="/" className="text-sm font-semibold text-slate-600 hover:text-red-600 transition">Home</Link>
+          <a href="/#features" className="text-sm font-semibold text-slate-600 hover:text-red-600 transition">Features</a>
+          <a href="/#how-it-works" className="text-sm font-semibold text-slate-600 hover:text-red-600 transition">How it works</a>
         </div>
 
         <div className="flex items-center gap-3">
@@ -217,79 +237,90 @@ export default function InternshipsDashboard() {
           </p>
         )}
 
-        <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {visible.map((job) => {
-            const isFav = favorites.has(job.id);
-            const isFakeLink = job.url.includes("example.com");
-            
-            return (
-              <article key={job.id} className="flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-5 shadow-sm hover:shadow-md transition">
-                <div>
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <h2 className="text-lg font-bold text-slate-900 leading-tight">{job.title}</h2>
-                      <p className="text-sm font-medium text-slate-600 mt-1">{job.company}</p>
-                    </div>
-                    <div className="flex gap-2">
-                      <button 
-                        onClick={async () => {
-                          const res = await fetch("/api/applications", {
-                            method: "POST",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({
-                              job_title: job.title,
-                              company: job.company,
-                              status: "Applied",
-                              date_applied: new Date().toISOString().split("T")[0]
-                            }),
-                          });
-                          if (res.ok) alert("Application tracked in your Dashboard!");
-                        }} 
-                        className="shrink-0 rounded-full border border-slate-200 bg-white px-2 py-1 text-xs font-bold text-slate-500 hover:text-red-600 hover:border-red-200 transition"
-                        title="Track Application"
-                      >
-                        + Track
-                      </button>
-                      <button onClick={() => toggleFavorite(job.id)} className={`shrink-0 rounded-full border px-2 py-1 text-xs font-bold transition ${isFav ? "border-red-200 bg-red-50 text-red-600" : "border-slate-200 bg-white text-slate-400 hover:bg-slate-50"}`}>
-                        {isFav ? "★ Saved" : "☆ Save"}
-                      </button>
-                    </div>
-                  </div>
-                  <div className="mt-4 flex flex-wrap gap-2 text-xs font-medium">
-                    <span className="rounded-md bg-slate-100 px-2 py-1 text-slate-600">📍 {job.country}</span>
-                    <span className="rounded-md bg-slate-100 px-2 py-1 text-slate-600">💼 {job.field}</span>
-                  </div>
-                  <p className="mt-3 text-sm text-slate-600"><span className="font-semibold text-slate-800">Deadline:</span> {job.deadline}</p>
-                  <div className="mt-3 flex flex-wrap gap-1.5">
-                    {(job.docs || []).map((doc) => (
-                      <span key={doc} className="rounded bg-slate-50 px-2 py-1 text-[11px] font-medium text-slate-500 border border-slate-100">{doc}</span>
-                    ))}
-                  </div>
-                </div>
-                <a 
-                  href={isFakeLink ? `https://www.google.com/search?q=${encodeURIComponent(job.title + " " + job.company)}` : job.url} 
-                  target="_blank" 
-                  rel="noreferrer" 
-                  onClick={async () => {
-                    await fetch("/api/applications", {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({
-                        job_title: job.title,
-                        company: job.company,
-                        status: "Applied",
-                        date_applied: new Date().toISOString().split("T")[0]
-                      }),
-                    });
-                  }}
-                  className="mt-5 block w-full rounded-lg bg-red-600 px-4 py-2 text-center text-sm font-bold text-white hover:bg-red-700 transition"
+        {/* Animated Grid */}
+        <motion.div layout className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+          <AnimatePresence mode="popLayout">
+            {visible.map((job) => {
+              const isFav = favorites.has(job.id);
+              const isFakeLink = job.url.includes("example.com");
+              
+              return (
+                <motion.article 
+                  layout
+                  initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
+                  transition={{ duration: 0.3 }}
+                  key={job.id} 
+                  className="flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-5 shadow-sm hover:shadow-md transition"
                 >
-                  {isFakeLink ? "Search on Google ↗" : "View / Apply →"}
-                </a>
-              </article>
-            );
-          })}
-        </div>
+                  <div>
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <h2 className="text-lg font-bold text-slate-900 leading-tight">{job.title}</h2>
+                        <p className="text-sm font-medium text-slate-600 mt-1">{job.company}</p>
+                      </div>
+                      <div className="flex gap-2">
+                        <button 
+                          onClick={async () => {
+                            const res = await fetch("/api/applications", {
+                              method: "POST",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({
+                                job_title: job.title,
+                                company: job.company,
+                                status: "Applied",
+                                date_applied: new Date().toISOString().split("T")[0]
+                              }),
+                            });
+                            if (res.ok) showToast("Application tracked in your Dashboard!");
+                          }} 
+                          className="shrink-0 rounded-full border border-slate-200 bg-white px-2 py-1 text-xs font-bold text-slate-500 hover:text-red-600 hover:border-red-200 transition"
+                          title="Track Application"
+                        >
+                          + Track
+                        </button>
+                        <button onClick={() => toggleFavorite(job.id)} className={`shrink-0 rounded-full border px-2 py-1 text-xs font-bold transition ${isFav ? "border-red-200 bg-red-50 text-red-600" : "border-slate-200 bg-white text-slate-400 hover:bg-slate-50"}`}>
+                          {isFav ? "★ Saved" : "☆ Save"}
+                        </button>
+                      </div>
+                    </div>
+                    <div className="mt-4 flex flex-wrap gap-2 text-xs font-medium">
+                      <span className="rounded-md bg-slate-100 px-2 py-1 text-slate-600">📍 {job.country}</span>
+                      <span className="rounded-md bg-slate-100 px-2 py-1 text-slate-600">💼 {job.field}</span>
+                    </div>
+                    <p className="mt-3 text-sm text-slate-600"><span className="font-semibold text-slate-800">Deadline:</span> {job.deadline}</p>
+                    <div className="mt-3 flex flex-wrap gap-1.5">
+                      {(job.docs || []).map((doc) => (
+                        <span key={doc} className="rounded bg-slate-50 px-2 py-1 text-[11px] font-medium text-slate-500 border border-slate-100">{doc}</span>
+                      ))}
+                    </div>
+                  </div>
+                  <a 
+                    href={isFakeLink ? `https://www.google.com/search?q=${encodeURIComponent(job.title + " " + job.company)}` : job.url} 
+                    target="_blank" 
+                    rel="noreferrer" 
+                    onClick={async () => {
+                      await fetch("/api/applications", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                          job_title: job.title,
+                          company: job.company,
+                          status: "Applied",
+                          date_applied: new Date().toISOString().split("T")[0]
+                        }),
+                      });
+                    }}
+                    className="mt-5 block w-full rounded-lg bg-red-600 px-4 py-2 text-center text-sm font-bold text-white hover:bg-red-700 transition"
+                  >
+                    {isFakeLink ? "Search on Google ↗" : "View / Apply →"}
+                  </a>
+                </motion.article>
+              );
+            })}
+          </AnimatePresence>
+        </motion.div>
 
         {totalPages > 1 && !favoritesOnly && (
           <div className="mt-12 flex items-center justify-center gap-2">
