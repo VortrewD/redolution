@@ -2,9 +2,18 @@
 
 import Link from "next/link";
 import { useSession, signIn } from "next-auth/react";
+import { useState, useEffect } from "react";
 
 export default function Home() {
   const { data: session } = useSession();
+  const [featuredJobs, setFeaturedJobs] = useState([]);
+
+  useEffect(() => {
+    fetch("/api/public-internships", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((d) => setFeaturedJobs(d.internships || []))
+      .catch(() => {});
+  }, []);
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-red-200">
@@ -22,7 +31,6 @@ export default function Home() {
           <div className="flex items-center gap-4">
             {session ? (
               <>
-                {/* Logged In: Internships in RED, Dashboard in WHITE */}
                 <Link href="/internships" className="rounded-full bg-red-600 px-5 py-2.5 text-sm font-bold text-white shadow-md hover:bg-red-700 hover:shadow-lg transition-all active:scale-95">
                   Internships
                 </Link>
@@ -31,12 +39,9 @@ export default function Home() {
                 </Link>
               </>
             ) : (
-              <>
-                {/* Logged Out: Just the Get Started button */}
-                <button onClick={() => signIn("google")} className="rounded-full bg-red-600 px-6 py-2.5 text-sm font-bold text-white shadow-md hover:bg-red-700 hover:shadow-lg transition-all active:scale-95">
-                  Get Started
-                </button>
-              </>
+              <button onClick={() => signIn("google")} className="rounded-full bg-red-600 px-6 py-2.5 text-sm font-bold text-white shadow-md hover:bg-red-700 hover:shadow-lg transition-all active:scale-95">
+                Get Started
+              </button>
             )}
           </div>
         </div>
@@ -117,7 +122,7 @@ export default function Home() {
               <p className="text-slate-500 mt-1 text-sm">A sneak peek at the latest opportunities.</p>
             </div>
             <button onClick={() => signIn("google")} className="text-sm font-bold text-red-600 hover:text-red-700 transition hidden sm:block">
-              View all 2,900+ internships →
+              View all internships →
             </button>
           </div>
           
@@ -144,7 +149,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
 
       {/* --- LOGO CLOUD --- */}
       <section className="border-y border-slate-200/60 bg-white/50 backdrop-blur-sm py-8">
