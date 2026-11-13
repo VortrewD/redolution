@@ -121,27 +121,39 @@ export default function Home() {
               <h2 className="text-2xl font-black text-slate-900 tracking-tight">Just added this week</h2>
               <p className="text-slate-500 mt-1 text-sm">A sneak peek at the latest opportunities.</p>
             </div>
-            <button onClick={() => signIn("google")} className="text-sm font-bold text-red-600 hover:text-red-700 transition hidden sm:block">
+            <button onClick={() => session ? window.location.href = "/internships" : signIn("google")} className="text-sm font-bold text-red-600 hover:text-red-700 transition hidden sm:block">
               View all internships →
             </button>
           </div>
           
           <div className="grid md:grid-cols-3 gap-6">
             {featuredJobs.map((job) => (
-              <div key={job.id} className="rounded-2xl border border-slate-200 bg-slate-50/50 p-6 shadow-sm hover:shadow-md transition group cursor-pointer" onClick={() => signIn("google")}>
+              <div 
+                key={job.id} 
+                className="rounded-2xl border border-slate-200 bg-slate-50/50 p-6 shadow-sm hover:shadow-md transition group cursor-pointer" 
+                onClick={() => {
+                  if (session) {
+                    window.location.href = "/internships";
+                  } else {
+                    signIn("google");
+                  }
+                }}
+              >
                 <div className="flex items-start justify-between gap-3 mb-4">
                   <div>
                     <h3 className="font-bold text-slate-900 leading-tight group-hover:text-red-600 transition">{job.title}</h3>
                     <p className="text-sm font-medium text-slate-500 mt-1">{job.company}</p>
                   </div>
-                  <div className="shrink-0 h-8 w-8 rounded-full bg-white border border-slate-200 flex items-center justify-center text-xs shadow-sm">🔒</div>
+                  <div className="shrink-0 h-8 w-8 rounded-full bg-white border border-slate-200 flex items-center justify-center text-xs shadow-sm">
+                    {session ? "→" : "🔒"}
+                  </div>
                 </div>
                 <div className="flex flex-wrap gap-2 text-xs font-medium">
                   <span className="rounded-md bg-white px-2 py-1 text-slate-600 border border-slate-200">📍 {job.country}</span>
                   <span className="rounded-md bg-white px-2 py-1 text-slate-600 border border-slate-200">💼 {job.field}</span>
                 </div>
                 <div className="mt-6 text-sm font-bold text-red-600 flex items-center gap-1 group-hover:gap-2 transition-all">
-                  Sign in to view details
+                  {session ? "View all internships" : "Sign in to view details"}
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
                 </div>
               </div>
