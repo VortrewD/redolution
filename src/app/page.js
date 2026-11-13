@@ -69,10 +69,19 @@ export default function Home() {
                 Stop checking 10 different websites every day. REDOLUTION automatically aggregates the latest opportunities from Indeed, Greenhouse, and top tech companies into one clean dashboard.
               </p>
               <div className="mt-8 flex flex-col sm:flex-row gap-4">
-                <button onClick={() => signIn("google")} className="rounded-full bg-red-600 px-8 py-4 text-base font-bold text-white shadow-xl shadow-red-200 hover:bg-red-700 hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2">
-                  Explore Internships
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
-                </button>
+            <button 
+  onClick={() => {
+    if (session) {
+      window.location.href = "/internships";
+    } else {
+      signIn("google");
+    }
+  }} 
+  className="rounded-full bg-red-600 px-8 py-4 text-base font-bold text-white shadow-xl shadow-red-200 hover:bg-red-700 hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
+>
+  Explore Internships
+  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+</button>
                 <a href="#how-it-works" className="rounded-full bg-white border border-slate-200 px-8 py-4 text-base font-bold text-slate-700 shadow-sm hover:bg-slate-50 transition-all flex items-center justify-center">
                   How it works
                 </a>
