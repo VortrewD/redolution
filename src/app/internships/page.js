@@ -5,7 +5,7 @@ import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import ScrollLetters from "../components/ScrollLetters";
+import FloatingLetters from "../components/FloatingLetters"; // <-- Changed to relaxing component
 
 const FAVORITES_KEY = "redolution:favorites";
 
@@ -143,7 +143,7 @@ export default function InternshipsDashboard() {
 
   return (
     <main className="mx-auto min-h-screen max-w-6xl px-4 py-8 relative bg-slate-50">
-      <ScrollLetters />
+      <FloatingLetters />
       
       <AnimatePresence>
         {toastMessage && (
@@ -203,7 +203,7 @@ export default function InternshipsDashboard() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search by job title or company (e.g., React, Stripe, Marketing)..." 
-              className="w-full rounded-xl border border-slate-300 pl-11 pr-4 py-3 text-sm focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none shadow-sm"
+              className="w-full rounded-xl border border-slate-300 pl-11 pr-4 py-3 text-sm focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none shadow-sm bg-white"
             />
           </div>
         </div>
@@ -211,21 +211,21 @@ export default function InternshipsDashboard() {
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
           <label className="block">
             <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Country</span>
-            <select value={country} onChange={(e) => setCountry(e.target.value)} className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none">
+            <select value={country} onChange={(e) => setCountry(e.target.value)} className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-red-500 outline-none bg-white">
               <option value="">All countries</option>
               {countries.map((c) => <option key={c} value={c}>{c}</option>)}
             </select>
           </label>
           <label className="block">
             <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Field</span>
-            <select value={field} onChange={(e) => setField(e.target.value)} className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none">
+            <select value={field} onChange={(e) => setField(e.target.value)} className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-red-500 outline-none bg-white">
               <option value="">All fields</option>
               {fields.map((f) => <option key={f} value={f}>{f}</option>)}
             </select>
           </label>
           <label className="block">
             <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Sort by</span>
-            <select value={sort} onChange={(e) => setSort(e.target.value)} className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none">
+            <select value={sort} onChange={(e) => setSort(e.target.value)} className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-red-500 outline-none bg-white">
               <option value="newest">Newest</option>
               <option value="deadline">Deadline</option>
               <option value="company">Company A-Z</option>
@@ -233,11 +233,11 @@ export default function InternshipsDashboard() {
           </label>
           <label className="block">
             <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Deadline from</span>
-            <input type="date" value={deadlineFrom} onChange={(e) => setDeadlineFrom(e.target.value)} className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none" />
+            <input type="date" value={deadlineFrom} onChange={(e) => setDeadlineFrom(e.target.value)} className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-red-500 outline-none bg-white" />
           </label>
           <label className="block">
             <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Deadline to</span>
-            <input type="date" value={deadlineTo} onChange={(e) => setDeadlineTo(e.target.value)} className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none" />
+            <input type="date" value={deadlineTo} onChange={(e) => setDeadlineTo(e.target.value)} className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-red-500 outline-none bg-white" />
           </label>
           <div className="flex items-end gap-2">
             <button onClick={clearFilters} className="w-full rounded-lg bg-slate-900 px-3 py-2 text-sm font-bold text-white hover:bg-slate-700 transition">
