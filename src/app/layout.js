@@ -1,6 +1,6 @@
 import "./globals.css";
 import Providers from "./providers";
-import { AppProvider } from "./context/AppContext";
+import { LanguageProvider } from "./context/LanguageContext";
 
 const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL || "https://redolution.example.com";
@@ -65,15 +65,15 @@ const jsonLd = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body>
+      <body className="bg-slate-50 text-slate-900 min-h-screen">
         <Providers>
-          <AppProvider>
+          <LanguageProvider>
             <script
               type="application/ld+json"
               dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
             />
             {children}
-          </AppProvider>
+          </LanguageProvider>
         </Providers>
       </body>
     </html>
