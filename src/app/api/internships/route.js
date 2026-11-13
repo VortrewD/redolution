@@ -23,8 +23,8 @@ export async function GET(request) {
     const field = searchParams.get("field") || "";
     const deadlineFrom = searchParams.get("deadlineFrom") || "";
     const deadlineTo = searchParams.get("deadlineTo") || "";
+    const sort = searchParams.get("sort") || "newest";
     
-    // Pagination params
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "12");
     const offset = (page - 1) * limit;
@@ -32,7 +32,6 @@ export async function GET(request) {
     const where = [];
     const args = [];
 
-    // Add search logic (searches in title and company)
     if (search) {
       where.push("(title LIKE ? OR company LIKE ?)");
       args.push(`%${search}%`, `%${search}%`);
@@ -45,7 +44,6 @@ export async function GET(request) {
 
     const whereClause = where.length ? ` WHERE ${where.join(" AND ")}` : "";
 
-    // Get total count for pagination
     const countResult = await db.execute({
       sql: `SELECT COUNT(*) as count FROM internships${whereClause}`,
       args: args
@@ -53,10 +51,13 @@ export async function GET(request) {
     
     const totalCount = Number(countResult.rows[0].count);
 
-    // Get the paginated data
+    let orderBy = "id DESC";
+    if (sort === "deadline") orderBy = "deadline ASC";
+    if (sort === "company") orderBy = "company ASC";
+
     const sql = `SELECT id, title, company, country, field, deadline, docs, url 
                  FROM internships${whereClause} 
-                 ORDER BY id DESC 
+                 ORDER BY ${orderBy} 
                  LIMIT ? OFFSET ?`;
     
     const result = await db.execute({

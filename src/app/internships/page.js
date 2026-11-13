@@ -37,6 +37,7 @@ export default function InternshipsDashboard() {
   const [field, setField] = useState("");
   const [deadlineFrom, setDeadlineFrom] = useState("");
   const [deadlineTo, setDeadlineTo] = useState("");
+  const [sort, setSort] = useState("newest");
   const [favoritesOnly, setFavoritesOnly] = useState(false);
 
   const [favorites, setFavorites] = useState(() => new Set());
@@ -61,6 +62,7 @@ export default function InternshipsDashboard() {
       if (field) params.set("field", field);
       if (deadlineFrom) params.set("deadlineFrom", deadlineFrom);
       if (deadlineTo) params.set("deadlineTo", deadlineTo);
+      if (sort) params.set("sort", sort);
       
       params.set("page", currentPage.toString());
       params.set("limit", limit.toString());
@@ -77,7 +79,7 @@ export default function InternshipsDashboard() {
     } finally {
       setLoading(false);
     }
-  }, [search, country, field, deadlineFrom, deadlineTo, currentPage, limit]);
+  }, [search, country, field, deadlineFrom, deadlineTo, sort, currentPage, limit]);
 
   useEffect(() => {
     fetch("/api/internships?limit=1000", { cache: "no-store" })
@@ -120,13 +122,14 @@ export default function InternshipsDashboard() {
     setField("");
     setDeadlineFrom("");
     setDeadlineTo("");
+    setSort("newest");
     setFavoritesOnly(false);
     setCurrentPage(1);
   }
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [search, country, field, deadlineFrom, deadlineTo]);
+  }, [search, country, field, deadlineFrom, deadlineTo, sort]);
 
   const showToast = (msg) => {
     setToastMessage(msg);
@@ -190,7 +193,6 @@ export default function InternshipsDashboard() {
       </div>
 
       <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-        {/* NEW SEARCH BAR */}
         <div className="mb-4">
           <div className="relative">
             <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
@@ -206,7 +208,7 @@ export default function InternshipsDashboard() {
           </div>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
           <label className="block">
             <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Country</span>
             <select value={country} onChange={(e) => setCountry(e.target.value)} className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none">
@@ -219,6 +221,14 @@ export default function InternshipsDashboard() {
             <select value={field} onChange={(e) => setField(e.target.value)} className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none">
               <option value="">All fields</option>
               {fields.map((f) => <option key={f} value={f}>{f}</option>)}
+            </select>
+          </label>
+          <label className="block">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Sort by</span>
+            <select value={sort} onChange={(e) => setSort(e.target.value)} className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none">
+              <option value="newest">Newest</option>
+              <option value="deadline">Deadline</option>
+              <option value="company">Company A-Z</option>
             </select>
           </label>
           <label className="block">
@@ -259,6 +269,7 @@ export default function InternshipsDashboard() {
             {visible.map((job) => {
               const isFav = favorites.has(job.id);
               const isFakeLink = job.url.includes("example.com");
+              const hasRealDeadline = job.deadline !== "2099-12-31";
               
               return (
                 <motion.article 
@@ -305,7 +316,13 @@ export default function InternshipsDashboard() {
                       <span className="rounded-md bg-slate-100 px-2 py-1 text-slate-600">📍 {job.country}</span>
                       <span className="rounded-md bg-slate-100 px-2 py-1 text-slate-600">💼 {job.field}</span>
                     </div>
-                    <p className="mt-3 text-sm text-slate-600"><span className="font-semibold text-slate-800">Deadline:</span> {job.deadline}</p>
+                    
+                    {hasRealDeadline ? (
+                      <p className="mt-3 text-sm text-slate-600"><span className="font-semibold text-slate-800">Deadline:</span> {job.deadline}</p>
+                    ) : (
+                      <p className="mt-3 text-sm font-medium text-green-600">Open until filled</p>
+                    )}
+
                     <div className="mt-3 flex flex-wrap gap-1.5">
                       {(job.docs || []).map((doc) => (
                         <span key={doc} className="rounded bg-slate-50 px-2 py-1 text-[11px] font-medium text-slate-500 border border-slate-100">{doc}</span>

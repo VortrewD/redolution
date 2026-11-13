@@ -84,20 +84,20 @@ export default function Home() {
               <div className="relative bg-white border border-slate-100 rounded-3xl shadow-2xl p-6 transform -rotate-1 hover:rotate-0 transition-transform duration-300">
                 <div className="flex justify-between items-start mb-4">
                   <div>
-                    <h3 className="text-xl font-bold text-slate-900">Software Engineer, Intern</h3>
-                    <p className="text-sm font-medium text-slate-500">Stripe · London</p>
+                    <h3 className="text-xl font-bold text-slate-900">Software Engineering Intern</h3>
+                    <p className="text-sm font-medium text-slate-500">Top Tech Company · Remote</p>
                   </div>
-                  <span className="px-3 py-1 bg-red-50 text-red-600 text-xs font-bold rounded-full border border-red-100">New</span>
+                  <span className="px-3 py-1 bg-red-50 text-red-600 text-xs font-bold rounded-full border border-red-100">Live</span>
                 </div>
                 <div className="space-y-3 mb-6">
                   <div className="flex gap-2">
                     <span className="px-2 py-1 bg-slate-100 text-slate-600 text-xs font-medium rounded-md">💻 Tech</span>
-                    <span className="px-2 py-1 bg-slate-100 text-slate-600 text-xs font-medium rounded-md">🎓 Summer 2027</span>
+                    <span className="px-2 py-1 bg-slate-100 text-slate-600 text-xs font-medium rounded-md">🌍 Global</span>
                   </div>
-                  <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden"><div className="h-full bg-red-500 w-3/4 rounded-full"></div></div>
-                  <p className="text-xs text-slate-400 font-medium">Deadline: 2 days left</p>
+                  <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden"><div className="h-full bg-green-500 w-full rounded-full"></div></div>
+                  <p className="text-xs text-green-600 font-medium">Actively Hiring</p>
                 </div>
-                <button className="w-full py-3 bg-slate-900 text-white text-sm font-bold rounded-xl hover:bg-slate-800 transition">View / Apply</button>
+                <button onClick={() => session ? window.location.href = "/internships" : signIn("google")} className="w-full py-3 bg-slate-900 text-white text-sm font-bold rounded-xl hover:bg-slate-800 transition">View / Apply</button>
               </div>
 
               <div className="absolute -right-6 top-10 bg-white border border-slate-100 rounded-2xl shadow-xl p-4 flex items-center gap-3 animate-bounce" style={{animationDuration: '3s'}}>
