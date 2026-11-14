@@ -1,6 +1,6 @@
 import "./globals.css";
 import Providers from "./providers";
-import { LanguageProvider } from "./context/LanguageContext";
+
 
 const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL || "https://redolution.example.com";
