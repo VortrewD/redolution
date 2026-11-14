@@ -7,7 +7,10 @@ const turso = createClient({
   authToken: process.env.TURSO_AUTH_TOKEN,
 });
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Only initialize Resend if the API key exists
+const resend = process.env.RESEND_API_KEY 
+  ? new Resend(process.env.RESEND_API_KEY) 
+  : null;
 
 const searchTerms = [
   'internship', 'stage', 'software engineer', 'data analyst', 
@@ -71,6 +74,11 @@ async function run() {
 
   // --- SEND EMAIL ALERTS ---
   if (totalInserted > 0) {
+    if (!resend) {
+      console.log("Skipping emails: RESEND_API_KEY is not set.");
+      return;
+    }
+
     console.log("Fetching subscribers...");
     const subsResult = await turso.execute("SELECT email FROM subscribers");
     const subscribers = subsResult.rows;
