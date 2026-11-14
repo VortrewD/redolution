@@ -1,7 +1,6 @@
 import "./globals.css";
 import Providers from "./providers";
 
-
 const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL || "https://redolution.example.com";
 
@@ -67,13 +66,11 @@ export default function RootLayout({ children }) {
     <html lang="en" suppressHydrationWarning>
       <body className="bg-slate-50 text-slate-900 min-h-screen">
         <Providers>
-          <LanguageProvider>
-            <script
-              type="application/ld+json"
-              dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-            />
-            {children}
-          </LanguageProvider>
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          />
+          {children}
         </Providers>
       </body>
     </html>
