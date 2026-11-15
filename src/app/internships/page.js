@@ -65,7 +65,6 @@ export default function InternshipsDashboard() {
       if (deadlineTo) params.set("deadlineTo", deadlineTo);
       if (sort) params.set("sort", sort);
       
-      // NEW: Pass the global favorites filter to the server
       if (favoritesOnly) {
         params.set("favoritesOnly", "true");
         params.set("favoritesList", Array.from(favorites).join(","));
@@ -99,10 +98,42 @@ export default function InternshipsDashboard() {
     fetchInternships();
   }, [fetchInternships]);
 
-  const countries = useMemo(
-    () => [...new Set(allForOptions.map((i) => i.country))].sort(),
-    [allForOptions]
-  );
+  // Group countries and cities dynamically
+  const groupedCountries = useMemo(() => {
+    const groups = {};
+    
+    allForOptions.forEach(item => {
+      let rawCountry = item.country || "Unknown";
+      let city = "All";
+
+      if (rawCountry.includes(",")) {
+        const parts = rawCountry.split(",").map(p => p.trim());
+        city = parts[0]; 
+        rawCountry = parts[parts.length - 1]; 
+      } else if (rawCountry !== "Morocco" && rawCountry !== "France" && rawCountry !== "Spain" && rawCountry !== "Remote") {
+        city = rawCountry;
+        rawCountry = "Other";
+      }
+
+      const codeMap = { 
+        "MA": "Morocco", "ES": "Spain", "FR": "France", "US": "United States", 
+        "GB": "United Kingdom", "DE": "Germany", "CA": "Canada", "IT": "Italy",
+        "NL": "Netherlands", "BE": "Belgium", "CH": "Switzerland"
+      };
+      if (codeMap[rawCountry]) rawCountry = codeMap[rawCountry];
+
+      if (!groups[rawCountry]) groups[rawCountry] = new Set();
+      groups[rawCountry].add(city);
+    });
+
+    const sortedGroups = {};
+    Object.keys(groups).sort().forEach(key => {
+      sortedGroups[key] = Array.from(groups[key]).sort();
+    });
+
+    return sortedGroups;
+  }, [allForOptions]);
+
   const fields = useMemo(
     () => [...new Set(allForOptions.map((i) => i.field))].sort(),
     [allForOptions]
@@ -219,7 +250,18 @@ export default function InternshipsDashboard() {
             <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Country</span>
             <select value={country} onChange={(e) => setCountry(e.target.value)} className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-red-500 outline-none bg-white">
               <option value="">All countries</option>
-              {countries.map((c) => <option key={c} value={c}>{c}</option>)}
+              {Object.keys(groupedCountries).map((countryName) => (
+                <optgroup key={countryName} label={countryName}>
+                  {groupedCountries[countryName].map((city) => {
+                    const value = city === "All" ? countryName : `${city}, ${countryName}`;
+                    return (
+                      <option key={value} value={value}>
+                        {city}
+                      </option>
+                    );
+                  })}
+                </optgroup>
+              ))}
             </select>
           </label>
           <label className="block">
