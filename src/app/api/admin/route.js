@@ -77,3 +77,38 @@ export async function DELETE(request) {
     return Response.json({ error: error.message }, { status: 500 });
   }
 }
+
+export async function POST(request) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session || session.user.email !== "vortexmontassir@gmail.com") {
+      return Response.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const body = await request.json();
+    const { title, company, country, field, deadline, docs, url } = body;
+
+    if (!title || !company || !url) {
+      return Response.json({ error: "Missing required fields" }, { status: 400 });
+    }
+
+    const db = createClient({
+      url: process.env.TURSO_DATABASE_URL,
+      authToken: process.env.TURSO_AUTH_TOKEN,
+    });
+
+    // We stringify docs if it's an array, or default to standard docs
+    const docsString = Array.isArray(docs) ? JSON.stringify(docs) : JSON.stringify(["CV", "Cover Letter"]);
+    const finalDeadline = deadline || null;
+
+    await db.execute({
+      sql: `INSERT INTO internships (title, company, country, field, deadline, docs, url) 
+            VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      args: [title, company, country, field, finalDeadline, docsString, url],
+    });
+
+    return Response.json({ success: true });
+  } catch (error) {
+    return Response.json({ error: error.message }, { status: 500 });
+  }
+}

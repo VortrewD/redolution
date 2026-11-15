@@ -65,6 +65,12 @@ export default function AdminPanel() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  // State for the new job form
+  const [newJob, setNewJob] = useState({
+    title: "", company: "", country: "Morocco", field: "Tech", deadline: "", url: ""
+  });
+  const [isAdding, setIsAdding] = useState(false);
+
   const fetchAdminData = () => {
     fetch("/api/admin", { cache: "no-store" })
       .then(r => r.json())
@@ -101,6 +107,28 @@ export default function AdminPanel() {
     } catch (err) {
       alert("Error deleting job.");
     }
+  };
+
+  const handleAddJob = async (e) => {
+    e.preventDefault();
+    setIsAdding(true);
+    try {
+      const res = await fetch("/api/admin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newJob)
+      });
+      if (res.ok) {
+        alert("Job added successfully!");
+        setNewJob({ title: "", company: "", country: "Morocco", field: "Tech", deadline: "", url: "" });
+        fetchAdminData();
+      } else {
+        alert("Failed to add job.");
+      }
+    } catch (err) {
+      alert("Error adding job.");
+    }
+    setIsAdding(false);
   };
 
   if (status === "loading" || loading || !session) {
@@ -215,6 +243,27 @@ export default function AdminPanel() {
               <li className="p-4 text-red-400 text-center">All users have profiles. Nice!</li>
             )}
           </ul>
+        </div>
+
+        {/* ADD NEW JOB FORM */}
+        <div className="rounded-2xl border border-red-900/50 bg-black/60 backdrop-blur-md shadow-sm overflow-hidden mb-8">
+          <div className="px-6 py-4 border-b border-red-900/50 bg-red-950/30">
+            <h2 className="text-lg font-bold text-white">Add a New Internship</h2>
+            <p className="text-xs text-red-400">Manually insert local jobs (OCP, Marjane, BIM, etc.)</p>
+          </div>
+          <form onSubmit={handleAddJob} className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <input required type="text" placeholder="Job Title (e.g., Data Analyst Intern)" value={newJob.title} onChange={(e) => setNewJob({...newJob, title: e.target.value})} className="w-full rounded-lg border border-red-900/50 bg-black/50 px-3 py-2 text-sm text-white focus:border-red-500 outline-none" />
+            <input required type="text" placeholder="Company (e.g., OCP Group)" value={newJob.company} onChange={(e) => setNewJob({...newJob, company: e.target.value})} className="w-full rounded-lg border border-red-900/50 bg-black/50 px-3 py-2 text-sm text-white focus:border-red-500 outline-none" />
+            <input type="text" placeholder="Country (e.g., Morocco)" value={newJob.country} onChange={(e) => setNewJob({...newJob, country: e.target.value})} className="w-full rounded-lg border border-red-900/50 bg-black/50 px-3 py-2 text-sm text-white focus:border-red-500 outline-none" />
+            <input type="text" placeholder="Field (e.g., Engineering)" value={newJob.field} onChange={(e) => setNewJob({...newJob, field: e.target.value})} className="w-full rounded-lg border border-red-900/50 bg-black/50 px-3 py-2 text-sm text-white focus:border-red-500 outline-none" />
+            <input type="date" placeholder="Deadline (Optional)" value={newJob.deadline} onChange={(e) => setNewJob({...newJob, deadline: e.target.value})} className="w-full rounded-lg border border-red-900/50 bg-black/50 px-3 py-2 text-sm text-white focus:border-red-500 outline-none [color-scheme:dark]" />
+            <input required type="url" placeholder="Application URL (https://...)" value={newJob.url} onChange={(e) => setNewJob({...newJob, url: e.target.value})} className="w-full rounded-lg border border-red-900/50 bg-black/50 px-3 py-2 text-sm text-white focus:border-red-500 outline-none" />
+            <div className="md:col-span-2 flex justify-end mt-2">
+              <button type="submit" disabled={isAdding} className="px-6 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg shadow-lg shadow-red-900/50 transition disabled:opacity-50">
+                {isAdding ? "Adding..." : "Add Internship to Database"}
+              </button>
+            </div>
+          </form>
         </div>
 
         {/* MANAGE JOBS */}
