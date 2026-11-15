@@ -42,7 +42,7 @@ export async function GET(request) {
     if (field) { where.push("field = ?"); args.push(field); }
     if (type) { where.push("type = ?"); args.push(type); }
     
-    if (deadlineFrom) { where.push("(deadline >= ? OR deadline IS NULL)"); args.push(deadlineFrom); }
+    if (deadlineFrom) { where.push("(deadline >= ? OR deadline IS NULL OR type = 'job')"); args.push(deadlineFrom); }
     if (deadlineTo) { where.push("(deadline <= ? OR deadline IS NULL)"); args.push(deadlineTo); }
 
     if (favoritesOnly && favoritesList) {
