@@ -8,9 +8,7 @@ export const dynamic = "force-dynamic";
 export async function GET(request) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session) {
-      return Response.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    if (!session) return Response.json({ error: "Unauthorized" }, { status: 401 });
 
     const db = createClient({
       url: process.env.TURSO_DATABASE_URL,
@@ -21,9 +19,12 @@ export async function GET(request) {
     const search = searchParams.get("search") || "";
     const country = searchParams.get("country") || "";
     const field = searchParams.get("field") || "";
+    const type = searchParams.get("type") || "";
     const deadlineFrom = searchParams.get("deadlineFrom") || "";
     const deadlineTo = searchParams.get("deadlineTo") || "";
     const sort = searchParams.get("sort") || "newest";
+    const favoritesOnly = searchParams.get("favoritesOnly") === "true";
+    const favoritesList = searchParams.get("favoritesList") || "";
     
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "12");
@@ -39,8 +40,21 @@ export async function GET(request) {
 
     if (country) { where.push("country = ?"); args.push(country); }
     if (field) { where.push("field = ?"); args.push(field); }
-    if (deadlineFrom) { where.push("deadline >= ?"); args.push(deadlineFrom); }
-    if (deadlineTo) { where.push("deadline <= ?"); args.push(deadlineTo); }
+    if (type) { where.push("type = ?"); args.push(type); }
+    
+    if (deadlineFrom) { where.push("(deadline >= ? OR deadline IS NULL)"); args.push(deadlineFrom); }
+    if (deadlineTo) { where.push("(deadline <= ? OR deadline IS NULL)"); args.push(deadlineTo); }
+
+    if (favoritesOnly && favoritesList) {
+      const ids = favoritesList.split(',').map(Number).filter(id => !isNaN(id));
+      if (ids.length > 0) {
+        const placeholders = ids.map(() => "?").join(",");
+        where.push(`id IN (${placeholders})`);
+        args.push(...ids);
+      } else {
+        where.push("1 = 0"); 
+      }
+    }
 
     const whereClause = where.length ? ` WHERE ${where.join(" AND ")}` : "";
 
@@ -52,10 +66,10 @@ export async function GET(request) {
     const totalCount = Number(countResult.rows[0].count);
 
     let orderBy = "id DESC";
-    if (sort === "deadline") orderBy = "deadline ASC";
+    if (sort === "deadline") orderBy = "deadline IS NULL, deadline ASC";
     if (sort === "company") orderBy = "company ASC";
 
-    const sql = `SELECT id, title, company, country, field, deadline, docs, url 
+    const sql = `SELECT id, title, company, country, field, deadline, docs, url, type 
                  FROM internships${whereClause} 
                  ORDER BY ${orderBy} 
                  LIMIT ? OFFSET ?`;
@@ -82,7 +96,6 @@ export async function GET(request) {
       currentPage: page 
     });
   } catch (error) {
-    console.error("Database error:", error);
     return Response.json({ error: error.message }, { status: 500 });
   }
 }

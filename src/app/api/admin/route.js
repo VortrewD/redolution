@@ -22,15 +22,9 @@ export async function GET() {
     const applicationsCount = await db.execute("SELECT COUNT(*) as count FROM applications");
     const subscribersCount = await db.execute("SELECT COUNT(*) as count FROM subscribers");
 
-    // Fetch recent known users
     const recentUsers = await db.execute("SELECT * FROM profiles WHERE full_name IS NOT NULL AND full_name != '' ORDER BY rowid DESC LIMIT 5");
-    
-    // Fetch unknown users (no name set)
     const unknownUsers = await db.execute("SELECT * FROM profiles WHERE full_name IS NULL OR full_name = '' ORDER BY rowid DESC");
-    
     const recentApps = await db.execute("SELECT * FROM applications ORDER BY id DESC LIMIT 5");
-    
-    // Fetch the 10 newest internships for management
     const recentInternships = await db.execute("SELECT * FROM internships ORDER BY id DESC LIMIT 10");
 
     return Response.json({
@@ -43,7 +37,7 @@ export async function GET() {
       recentUsers: recentUsers.rows,
       recentApps: recentApps.rows,
       recentInternships: recentInternships.rows,
-      unknownUsers: unknownUsers.rows, // <-- ADDED
+      unknownUsers: unknownUsers.rows,
     });
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500 });
@@ -86,7 +80,7 @@ export async function POST(request) {
     }
 
     const body = await request.json();
-    const { title, company, country, field, deadline, docs, url } = body;
+    const { title, company, country, field, deadline, docs, url, type } = body;
 
     if (!title || !company || !url) {
       return Response.json({ error: "Missing required fields" }, { status: 400 });
@@ -97,14 +91,14 @@ export async function POST(request) {
       authToken: process.env.TURSO_AUTH_TOKEN,
     });
 
-    // We stringify docs if it's an array, or default to standard docs
     const docsString = Array.isArray(docs) ? JSON.stringify(docs) : JSON.stringify(["CV", "Cover Letter"]);
     const finalDeadline = deadline || null;
+    const finalType = type || "internship";
 
     await db.execute({
-      sql: `INSERT INTO internships (title, company, country, field, deadline, docs, url) 
-            VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      args: [title, company, country, field, finalDeadline, docsString, url],
+      sql: `INSERT INTO internships (title, company, country, field, deadline, docs, url, type) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      args: [title, company, country, field, finalDeadline, docsString, url, finalType],
     });
 
     return Response.json({ success: true });
