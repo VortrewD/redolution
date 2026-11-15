@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useSession, signIn } from "next-auth/react";
 import { useState, useEffect } from "react";
-import FloatingLetters from "./components/FloatingLetters";
 
 export default function Home() {
   const { data: session } = useSession();
@@ -18,9 +17,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-red-200 relative overflow-hidden">
-      
-      {/* THE NEW ARTISTIC BACKGROUND */}
-      <FloatingLetters />
       
       {/* --- NAVBAR --- */}
       <nav className="fixed top-0 w-full z-50 border-b border-slate-200/50 bg-white/70 backdrop-blur-xl">
@@ -95,7 +91,8 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="relative lg:ml-10 hidden lg:block">
+            {/* HERO CARD (Now visible on mobile) */}
+            <div className="relative lg:ml-10 mt-12 lg:mt-0">
               <div className="absolute inset-0 bg-gradient-to-tr from-red-100 to-slate-100 rounded-3xl transform rotate-3 scale-105 opacity-50 blur-sm"></div>
               <div className="relative bg-white border border-slate-100 rounded-3xl shadow-2xl p-6 transform -rotate-1 hover:rotate-0 transition-transform duration-300">
                 <div className="flex justify-between items-start mb-4">
@@ -129,7 +126,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- FEATURED INTERNSHIPS --- */}
+      {/* --- FEATURED INTERNSHIPS (Limit 3 + Login Prompt) --- */}
       <section className="py-12 bg-white/80 backdrop-blur-md border-t border-slate-100 relative z-10">
         <div className="mx-auto max-w-7xl px-6">
           <div className="flex items-end justify-between mb-8">
@@ -143,7 +140,7 @@ export default function Home() {
           </div>
           
           <div className="grid md:grid-cols-3 gap-6">
-            {featuredJobs.map((job) => (
+            {featuredJobs.slice(0, 3).map((job) => (
               <div 
                 key={job.id} 
                 className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition group cursor-pointer" 
