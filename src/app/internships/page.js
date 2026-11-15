@@ -74,7 +74,10 @@ export default function InternshipsDashboard() {
     } catch (e) { setError("Could not load opportunities."); } finally { setLoading(false); }
   }, [search, country, field, type, deadlineFrom, deadlineTo, sort, currentPage, limit, favoritesOnly, favorites]);
 
-  useEffect(() => { fetch("/api/internships?limit=1000").then(r=>r.json()).then(d=>setAllForOptions(d.internships || [])).catch(()=>{}); }, []);
+  useEffect(() => { 
+    fetch("/api/internships?limit=1000").then(r=>r.json()).then(d=>setAllForOptions(d.internships || [])).catch(()=>{}); 
+  }, []);
+  
   useEffect(() => { fetchInternships(); }, [fetchInternships]);
 
   const groupedCountries = useMemo(() => {
@@ -95,6 +98,7 @@ export default function InternshipsDashboard() {
       if (!groups[displayCountry]) groups[displayCountry] = new Map();
       groups[displayCountry].set(rawCountry, { city: displayCity, raw: rawCountry });
     });
+    
     const sortedGroups = {};
     Object.keys(groups).sort().forEach(key => {
       sortedGroups[key] = Array.from(groups[key].values()).sort((a, b) => a.city.localeCompare(b.city));
