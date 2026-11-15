@@ -65,6 +65,12 @@ export default function InternshipsDashboard() {
       if (deadlineTo) params.set("deadlineTo", deadlineTo);
       if (sort) params.set("sort", sort);
       
+      // NEW: Pass the global favorites filter to the server
+      if (favoritesOnly) {
+        params.set("favoritesOnly", "true");
+        params.set("favoritesList", Array.from(favorites).join(","));
+      }
+      
       params.set("page", currentPage.toString());
       params.set("limit", limit.toString());
 
@@ -80,7 +86,7 @@ export default function InternshipsDashboard() {
     } finally {
       setLoading(false);
     }
-  }, [search, country, field, deadlineFrom, deadlineTo, sort, currentPage, limit]);
+  }, [search, country, field, deadlineFrom, deadlineTo, sort, currentPage, limit, favoritesOnly, favorites]);
 
   useEffect(() => {
     fetch("/api/internships?limit=1000", { cache: "no-store" })
@@ -246,7 +252,15 @@ export default function InternshipsDashboard() {
           </div>
         </div>
         <label className="mt-4 inline-flex cursor-pointer items-center gap-2 text-sm font-medium text-slate-700">
-          <input type="checkbox" checked={favoritesOnly} onChange={(e) => setFavoritesOnly(e.target.checked)} className="rounded text-red-600 focus:ring-red-500" />
+          <input 
+            type="checkbox" 
+            checked={favoritesOnly} 
+            onChange={(e) => {
+              setFavoritesOnly(e.target.checked);
+              setCurrentPage(1);
+            }} 
+            className="rounded text-red-600 focus:ring-red-500" 
+          />
           Show favourites only ({favorites.size})
         </label>
       </section>
@@ -269,7 +283,6 @@ export default function InternshipsDashboard() {
             {visible.map((job) => {
               const isFav = favorites.has(job.id);
               const isFakeLink = job.url.includes("example.com");
-              const hasRealDeadline = job.deadline !== "2099-12-31";
               
               return (
                 <motion.article 
@@ -317,10 +330,10 @@ export default function InternshipsDashboard() {
                       <span className="rounded-md bg-slate-100 px-2 py-1 text-slate-600">💼 {job.field}</span>
                     </div>
                     
-                    {hasRealDeadline ? (
+                    {job.deadline ? (
                       <p className="mt-3 text-sm text-slate-600"><span className="font-semibold text-slate-800">Deadline:</span> {job.deadline}</p>
                     ) : (
-                      <p className="mt-3 text-sm font-medium text-green-600">Open until filled</p>
+                      <p className="mt-3 text-sm font-medium text-green-600">Rolling Deadline</p>
                     )}
 
                     <div className="mt-3 flex flex-wrap gap-1.5">

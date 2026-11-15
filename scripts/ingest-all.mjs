@@ -20,6 +20,17 @@ const searchTerms = [
 
 const countries = ['morocco', 'france', 'usa', 'uk', 'germany', 'canada', 'spain'];
 
+// Helper function to fix encoding bugs like "MÃ¼nchen"
+function cleanString(str) {
+  if (!str) return "Unknown";
+  return str
+    .replace(/Ã¼/g, 'ü')
+    .replace(/Ã©/g, 'é')
+    .replace(/Ã /g, 'à')
+    .replace(/Ã¨/g, 'è')
+    .replace(/Ã´/g, 'ô');
+}
+
 async function run() {
   let totalInserted = 0;
 
@@ -41,13 +52,22 @@ async function run() {
 
         if (result.jobs && result.jobs.length > 0) {
           for (const job of result.jobs) {
-            const title = job.title || 'Unknown';
-            const company = job.company || 'Unknown';
-            const jobCountry = job.location || country;
+            const title = cleanString(job.title);
+            const company = cleanString(job.company);
+            const jobCountry = cleanString(job.location) || country;
             const field = term;
-            const deadline = '2099-12-31';
+            
+            // FIX 1: Set deadline to null instead of 2099
+            const deadline = null; 
+            
             const docs = JSON.stringify(['CV', 'Cover Letter']);
             const url = job.jobUrl || '';
+
+            // FIX 2: Skip senior/full-time jobs that slipped through
+            const lowerTitle = title.toLowerCase();
+            if (lowerTitle.includes('senior') || lowerTitle.includes('manager') || lowerTitle.includes('lead')) {
+              continue;
+            }
 
             if (url) {
               await turso.execute({
