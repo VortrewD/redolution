@@ -13,7 +13,6 @@ function RedMatrix() {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
 
-    // Make canvas full screen
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
@@ -26,18 +25,14 @@ function RedMatrix() {
     }
 
     const draw = () => {
-      // Black background with a tiny bit of transparency to create trails
       ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      ctx.fillStyle = "#dc2626"; // Red text
+      ctx.fillStyle = "#dc2626";
       ctx.font = fontSize + "px monospace";
 
       for (let i = 0; i < drops.length; i++) {
         const text = letters[Math.floor(Math.random() * letters.length)];
         ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-
-        // Reset drop to top randomly to create the rain effect
         if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
           drops[i] = 0;
         }
@@ -46,8 +41,6 @@ function RedMatrix() {
     };
 
     const interval = setInterval(draw, 35);
-
-    // Handle window resize
     const handleResize = () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
@@ -60,12 +53,7 @@ function RedMatrix() {
     };
   }, []);
 
-  return (
-    <canvas
-      ref={canvasRef}
-      className="fixed top-0 left-0 w-full h-full pointer-events-none opacity-40 z-0"
-    />
-  );
+  return <canvas ref={canvasRef} className="fixed top-0 left-0 w-full h-full pointer-events-none opacity-40 z-0" />;
 }
 
 // --- MAIN ADMIN PAGE ---
@@ -77,26 +65,44 @@ export default function AdminPanel() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  const fetchAdminData = () => {
+    // FIX: Added { cache: "no-store" } to force fresh data from the API
+    fetch("/api/admin", { cache: "no-store" })
+      .then(r => r.json())
+      .then(d => {
+        if (d.error) setError(d.error);
+        else setData(d);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  };
+
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/");
     } else if (status === "authenticated") {
-      // Check if it's you
       if (session.user.email !== "vortexmontassir@gmail.com") {
         router.push("/");
         return;
       }
-      
-      fetch("/api/admin")
-        .then(r => r.json())
-        .then(d => {
-          if (d.error) setError(d.error);
-          else setData(d);
-          setLoading(false);
-        })
-        .catch(() => setLoading(false));
+      fetchAdminData();
     }
   }, [status, session, router]);
+
+  const handleDeleteJob = async (id) => {
+    if (!confirm("Are you sure you want to delete this job?")) return;
+    
+    try {
+      const res = await fetch(`/api/admin?id=${id}`, { method: "DELETE" });
+      if (res.ok) {
+        fetchAdminData();
+      } else {
+        alert("Failed to delete job.");
+      }
+    } catch (err) {
+      alert("Error deleting job.");
+    }
+  };
 
   if (status === "loading" || loading || !session) {
     return <div className="min-h-screen flex items-center justify-center font-bold text-white bg-black">Checking Admin Access...</div>;
@@ -146,7 +152,7 @@ export default function AdminPanel() {
           </div>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-8">
+        <div className="grid lg:grid-cols-2 gap-8 mb-8">
           {/* RECENT USERS */}
           <div className="rounded-2xl border border-red-900/50 bg-black/60 backdrop-blur-md shadow-sm overflow-hidden">
             <div className="px-6 py-4 border-b border-red-900/50 bg-red-950/30">
@@ -189,6 +195,37 @@ export default function AdminPanel() {
             </ul>
           </div>
         </div>
+
+        {/* MANAGE JOBS */}
+        <div className="rounded-2xl border border-red-900/50 bg-black/60 backdrop-blur-md shadow-sm overflow-hidden">
+          <div className="px-6 py-4 border-b border-red-900/50 bg-red-950/30 flex justify-between items-center">
+            <h2 className="text-lg font-bold text-white">Manage Newest Jobs</h2>
+            <span className="text-xs text-red-400">Delete spam or fake listings</span>
+          </div>
+          <ul className="divide-y divide-red-900/30">
+            {data?.recentInternships?.map((job) => (
+              <li key={job.id} className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-red-900/10 transition">
+                <div>
+                  <p className="font-bold text-white">{job.title}</p>
+                  <p className="text-xs text-red-400">{job.company} · {job.country}</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <a href={job.url} target="_blank" rel="noreferrer" className="text-xs text-slate-300 underline hover:text-white">View Link</a>
+                  <button 
+                    onClick={() => handleDeleteJob(job.id)}
+                    className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded shadow-lg shadow-red-900/50 transition"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </li>
+            ))}
+            {(!data?.recentInternships || data.recentInternships.length === 0) && (
+              <li className="p-4 text-red-400 text-center">No internships found.</li>
+            )}
+          </ul>
+        </div>
+
       </div>
     </main>
   );
