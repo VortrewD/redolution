@@ -22,7 +22,12 @@ export async function GET() {
     const applicationsCount = await db.execute("SELECT COUNT(*) as count FROM applications");
     const subscribersCount = await db.execute("SELECT COUNT(*) as count FROM subscribers");
 
-    const recentUsers = await db.execute("SELECT * FROM profiles ORDER BY rowid DESC LIMIT 5");
+    // Fetch recent known users
+    const recentUsers = await db.execute("SELECT * FROM profiles WHERE full_name IS NOT NULL AND full_name != '' ORDER BY rowid DESC LIMIT 5");
+    
+    // Fetch unknown users (no name set)
+    const unknownUsers = await db.execute("SELECT * FROM profiles WHERE full_name IS NULL OR full_name = '' ORDER BY rowid DESC");
+    
     const recentApps = await db.execute("SELECT * FROM applications ORDER BY id DESC LIMIT 5");
     
     // Fetch the 10 newest internships for management
@@ -38,6 +43,7 @@ export async function GET() {
       recentUsers: recentUsers.rows,
       recentApps: recentApps.rows,
       recentInternships: recentInternships.rows,
+      unknownUsers: unknownUsers.rows, // <-- ADDED
     });
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500 });

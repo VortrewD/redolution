@@ -66,7 +66,6 @@ export default function AdminPanel() {
   const [error, setError] = useState("");
 
   const fetchAdminData = () => {
-    // FIX: Added { cache: "no-store" } to force fresh data from the API
     fetch("/api/admin", { cache: "no-store" })
       .then(r => r.json())
       .then(d => {
@@ -194,6 +193,28 @@ export default function AdminPanel() {
               )}
             </ul>
           </div>
+        </div>
+
+        {/* UNKNOWN USERS SECTION */}
+        <div className="rounded-2xl border border-red-900/50 bg-black/60 backdrop-blur-md shadow-sm overflow-hidden mb-8">
+          <div className="px-6 py-4 border-b border-red-900/50 bg-red-950/30 flex justify-between items-center">
+            <h2 className="text-lg font-bold text-white">Unknown Users (No Profile)</h2>
+            <span className="text-xs text-red-400">Signed in but haven't set a name</span>
+          </div>
+          <ul className="divide-y divide-red-900/30">
+            {data?.unknownUsers?.map((user) => (
+              <li key={user.user_email} className="p-4 flex items-center justify-between hover:bg-red-900/10 transition">
+                <div>
+                  <p className="font-bold text-red-400">Anonymous User</p>
+                  <p className="text-xs text-slate-300">{user.user_email}</p>
+                </div>
+                <span className="text-xs font-bold px-2 py-1 bg-red-900/30 rounded text-red-300 border border-red-900/50">Needs Name</span>
+              </li>
+            ))}
+            {(!data?.unknownUsers || data.unknownUsers.length === 0) && (
+              <li className="p-4 text-red-400 text-center">All users have profiles. Nice!</li>
+            )}
+          </ul>
         </div>
 
         {/* MANAGE JOBS */}
