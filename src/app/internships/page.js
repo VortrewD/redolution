@@ -103,32 +103,32 @@ export default function InternshipsDashboard() {
     const groups = {};
     
     allForOptions.forEach(item => {
-      let rawCountry = item.country || "Unknown";
-      let city = "All";
+      const rawCountry = item.country || "Unknown";
+      let displayCountry = rawCountry;
+      let displayCity = "All";
 
       if (rawCountry.includes(",")) {
         const parts = rawCountry.split(",").map(p => p.trim());
-        city = parts[0]; 
-        rawCountry = parts[parts.length - 1]; 
-      } else if (rawCountry !== "Morocco" && rawCountry !== "France" && rawCountry !== "Spain" && rawCountry !== "Remote") {
-        city = rawCountry;
-        rawCountry = "Other";
+        displayCity = parts[0]; 
+        const countryCode = parts[parts.length - 1]; 
+        
+        const codeMap = { 
+          "MA": "Morocco", "ES": "Spain", "FR": "France", "US": "United States", 
+          "GB": "United Kingdom", "DE": "Germany", "CA": "Canada", "IT": "Italy",
+          "NL": "Netherlands", "BE": "Belgium", "CH": "Switzerland"
+        };
+        displayCountry = codeMap[countryCode] || countryCode;
       }
 
-      const codeMap = { 
-        "MA": "Morocco", "ES": "Spain", "FR": "France", "US": "United States", 
-        "GB": "United Kingdom", "DE": "Germany", "CA": "Canada", "IT": "Italy",
-        "NL": "Netherlands", "BE": "Belgium", "CH": "Switzerland"
-      };
-      if (codeMap[rawCountry]) rawCountry = codeMap[rawCountry];
-
-      if (!groups[rawCountry]) groups[rawCountry] = new Set();
-      groups[rawCountry].add(city);
+      if (!groups[displayCountry]) groups[displayCountry] = new Map();
+      
+      // Store as a Map to prevent duplicate cities, using raw string as the key
+      groups[displayCountry].set(rawCountry, { city: displayCity, raw: rawCountry });
     });
 
     const sortedGroups = {};
     Object.keys(groups).sort().forEach(key => {
-      sortedGroups[key] = Array.from(groups[key]).sort();
+      sortedGroups[key] = Array.from(groups[key].values()).sort((a, b) => a.city.localeCompare(b.city));
     });
 
     return sortedGroups;
@@ -252,14 +252,11 @@ export default function InternshipsDashboard() {
               <option value="">All countries</option>
               {Object.keys(groupedCountries).map((countryName) => (
                 <optgroup key={countryName} label={countryName}>
-                  {groupedCountries[countryName].map((city) => {
-                    const value = city === "All" ? countryName : `${city}, ${countryName}`;
-                    return (
-                      <option key={value} value={value}>
-                        {city}
-                      </option>
-                    );
-                  })}
+                  {groupedCountries[countryName].map((item) => (
+                    <option key={item.raw} value={item.raw}>
+                      {item.city}
+                    </option>
+                  ))}
                 </optgroup>
               ))}
             </select>
