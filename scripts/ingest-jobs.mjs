@@ -1,13 +1,13 @@
 import { scrapeJobs } from 'ts-jobspy';
 import { createClient } from '@libsql/client';
 
-// Use environment variables for GitHub Actions compatibility
+// Hardcoded Turso credentials for local execution
 const turso = createClient({
-  url: process.env.TURSO_DATABASE_URL,
-  authToken: process.env.TURSO_AUTH_TOKEN,
+  url: "libsql://redolution-vortrewd.aws-eu-central-1.turso.io",
+  authToken: "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJleHAiOjE4MjY2NDQ4MjIsImlhdCI6MTc5NDUwNDAyMiwiaWQiOiIwMWExZDBhMy1hMjAxLTc3N2UtODMwNC1iY2Q2ODkxNTkxNmMiLCJraWQiOiJYdWtrTUZYcHlSTVZRdGc4ZkliQmsyei1STGoydUktQ211aWhOaENJME8wIiwicmlkIjoiYTViYzUzZGYtMTE0MC00ZjVmLTk1ZjMtMzg4YjQ0MzM4NjM2In0.C1gblkWJTjrKQcfLq47hcC_8_vZB22Yy_rrT65atr0sMEbdHScMRwBUxUVyP2cU5zH2ImfZ4pv4g4w9bliUbDg",
 });
 
-// NEW search terms we haven't used yet
+// Search terms
 const searchTerms = [
   'stagiaire', 
   'alternance', 
@@ -21,7 +21,7 @@ const searchTerms = [
   'willing to train'
 ];
 
-// NEW countries to avoid IP blocks
+// Target countries
 const countries = ['belgium', 'netherlands', 'switzerland', 'portugal', 'ireland'];
 
 function cleanString(str) {
@@ -78,7 +78,10 @@ async function run() {
           console.log(`  -> No jobs found.`);
         }
       } catch (error) {
-        console.error(`  -> Error for ${term} in ${country}:`, error.message);
+        console.error(`  -> CRITICAL ERROR for ${term} in ${country}:`, error.message);
+        if (error.meta) {
+          console.error(`  -> Meta details:`, JSON.stringify(error.meta, null, 2));
+        }
       }
       
       await new Promise(r => setTimeout(r, 3000));
