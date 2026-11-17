@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import FloatingLetters from "../components/FloatingLetters";
 
 export default function Dashboard() {
   const { data: session, status } = useSession();
@@ -100,6 +101,7 @@ export default function Dashboard() {
 
   return (
     <main className="mx-auto min-h-screen max-w-6xl px-4 py-8 relative bg-slate-50">
+      <FloatingLetters />
       
       <header className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-6 mb-8 relative z-10">
         <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition">
@@ -110,7 +112,6 @@ export default function Dashboard() {
           <Link href="/" className="text-sm font-semibold text-slate-600 hover:text-red-600 transition">Home</Link>
           <Link href="/internships" className="text-sm font-semibold text-slate-600 hover:text-red-600 transition">Internships</Link>
           <Link href="/dashboard" className="text-sm font-semibold text-red-600 transition">Dashboard</Link>
-          <Link href="/profile" className="text-sm font-semibold text-slate-600 hover:text-red-600 transition">Profile</Link>
         </div>
 
         <div className="flex items-center gap-3">

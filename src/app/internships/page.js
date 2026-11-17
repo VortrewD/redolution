@@ -155,7 +155,6 @@ export default function InternshipsDashboard() {
           <Link href="/" className="text-sm font-semibold text-slate-600 hover:text-red-600 transition">Home</Link>
           <Link href="/internships" className="text-sm font-semibold text-red-600 transition">Internships</Link>
           <Link href="/dashboard" className="text-sm font-semibold text-slate-600 hover:text-red-600 transition">Dashboard</Link>
-          <Link href="/profile" className="text-sm font-semibold text-slate-600 hover:text-red-600 transition">Profile</Link>
         </div>
         <div className="flex items-center gap-3">
           <Link href="/profile" className="rounded-full bg-red-600 px-5 py-2 text-sm font-bold text-white shadow-sm hover:bg-red-700 transition ml-2">Profile</Link>
