@@ -107,13 +107,11 @@ export default function Dashboard() {
         <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition">
           <img src="/redolution-logo.png" alt="REDOLUTION" className="h-10 w-auto" />
         </Link>
-        
         <div className="hidden md:flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
           <Link href="/" className="text-sm font-semibold text-slate-600 hover:text-red-600 transition">Home</Link>
           <Link href="/internships" className="text-sm font-semibold text-slate-600 hover:text-red-600 transition">Internships</Link>
           <Link href="/dashboard" className="text-sm font-semibold text-red-600 transition">Dashboard</Link>
         </div>
-
         <div className="flex items-center gap-3">
           <Link href="/profile" className="rounded-full bg-red-600 px-5 py-2 text-sm font-bold text-white shadow-sm hover:bg-red-700 transition ml-2">
             Profile
@@ -129,15 +127,14 @@ export default function Dashboard() {
         <p className="mt-2 text-slate-600">Track your internship applications, interviews, and offers.</p>
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-8 relative z-10">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 relative z-10">
         <div className="lg:col-span-1">
           <div className="rounded-2xl border border-slate-200 bg-white/80 backdrop-blur-md p-6 shadow-sm">
             <h2 className="text-lg font-bold text-slate-900 mb-4">Log a New Application</h2>
             <form onSubmit={handleAddApplication} className="space-y-4">
-              
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Select Internship (Optional)</label>
-                <select value={selectedJobId} onChange={handleSelectJob} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none mb-4 bg-slate-50">
+                <select value={selectedJobId} onChange={handleSelectJob} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-red-500 outline-none mb-4 bg-slate-50">
                   <option value="">-- Choose from list to auto-fill --</option>
                   {allInternships.map((job) => (
                     <option key={job.id} value={job.id}>
@@ -149,15 +146,15 @@ export default function Dashboard() {
 
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Job Title</label>
-                <input required type="text" value={jobTitle} onChange={(e) => setJobTitle(e.target.value)} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none" placeholder="Software Engineer Intern" />
+                <input required type="text" value={jobTitle} onChange={(e) => setJobTitle(e.target.value)} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-red-500 outline-none" placeholder="Software Engineer Intern" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Company</label>
-                <input required type="text" value={company} onChange={(e) => setCompany(e.target.value)} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none" placeholder="Stripe" />
+                <input required type="text" value={company} onChange={(e) => setCompany(e.target.value)} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-red-500 outline-none" placeholder="Stripe" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Status</label>
-                <select value={statusValue} onChange={(e) => setStatusValue(e.target.value)} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none">
+                <select value={statusValue} onChange={(e) => setStatusValue(e.target.value)} className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-red-500 outline-none">
                   <option value="Applied">Applied</option>
                   <option value="Interviewing">Interviewing</option>
                   <option value="Offer">Offer</option>
@@ -184,7 +181,7 @@ export default function Dashboard() {
             ) : (
               <ul className="divide-y divide-slate-200">
                 {applications.map((app) => (
-                  <li key={app.id} className="p-6 flex items-center justify-between hover:bg-slate-50 transition">
+                  <li key={app.id} className="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-slate-50 transition">
                     <div>
                       <h3 className="font-bold text-slate-900">{app.job_title}</h3>
                       <p className="text-sm text-slate-600">{app.company} · Applied on {app.date_applied}</p>
