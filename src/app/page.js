@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useSession, signIn } from "next-auth/react";
 import { useState, useEffect } from "react";
+import FloatingLetters from "./components/FloatingLetters";
 
 export default function Home() {
   const { data: session } = useSession();
@@ -17,6 +18,9 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-red-200 relative overflow-hidden">
+      
+      {/* THE ARTISTIC BACKGROUND */}
+      <FloatingLetters />
       
       {/* --- NAVBAR --- */}
       <nav className="fixed top-0 w-full z-50 border-b border-slate-200/50 bg-white/70 backdrop-blur-xl">
@@ -91,7 +95,7 @@ export default function Home() {
               </div>
             </div>
 
-            {/* HERO CARD (Now visible on mobile) */}
+            {/* HERO CARD */}
             <div className="relative lg:ml-10 mt-12 lg:mt-0">
               <div className="absolute inset-0 bg-gradient-to-tr from-red-100 to-slate-100 rounded-3xl transform rotate-3 scale-105 opacity-50 blur-sm"></div>
               <div className="relative bg-white border border-slate-100 rounded-3xl shadow-2xl p-6 transform -rotate-1 hover:rotate-0 transition-transform duration-300">
@@ -126,7 +130,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- FEATURED INTERNSHIPS (Limit 3 + Login Prompt) --- */}
+      {/* --- FEATURED INTERNSHIPS --- */}
       <section className="py-12 bg-white/80 backdrop-blur-md border-t border-slate-100 relative z-10">
         <div className="mx-auto max-w-7xl px-6">
           <div className="flex items-end justify-between mb-8">
@@ -163,7 +167,9 @@ export default function Home() {
                 </div>
                 <div className="flex flex-wrap gap-2 text-xs font-medium">
                   <span className="rounded-md bg-slate-50 px-2 py-1 text-slate-600 border border-slate-200">📍 {job.country}</span>
-                  <span className="rounded-md bg-slate-50 px-2 py-1 text-slate-600 border border-slate-200">💼 {job.field}</span>
+                  <span className="rounded-md bg-slate-50 px-2 py-1 text-slate-600 border border-slate-200">
+                    {job.type === 'scholarship' ? '🎓' : job.type === 'solidarity' ? '🤝' : job.type === 'job' ? '💼' : '💼'} {job.field}
+                  </span>
                 </div>
                 <div className="mt-6 text-sm font-bold text-red-600 flex items-center gap-1 group-hover:gap-2 transition-all">
                   {session ? "View all internships" : "Sign in to view details"}
@@ -257,8 +263,8 @@ export default function Home() {
           </div>
           <p className="text-sm text-slate-500 font-medium">© {new Date().getFullYear()} REDOLUTION. Built for students.</p>
           <div className="flex gap-6">
-            <a href="#" className="text-slate-400 hover:text-red-600 transition">Twitter</a>
-            <a href="#" className="text-slate-400 hover:text-red-600 transition">LinkedIn</a>
+            <a href="mailto:vortexmontassir@gmail.com" className="text-slate-400 hover:text-red-600 transition">Contact Us</a>
+            <a href="/internships" className="text-slate-400 hover:text-red-600 transition">Browse Opportunities</a>
           </div>
         </div>
       </footer>
