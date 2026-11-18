@@ -73,7 +73,7 @@ export default function Profile() {
   if (status === "loading" || !session || loading) return <div className="min-h-screen flex items-center justify-center text-slate-500 font-bold">Loading...</div>;
 
   return (
-    <main className="mx-auto min-h-screen max-w-4xl px-4 py-8 relative bg-slate-50 text-slate-900">
+    <main className="min-h-screen w-full relative bg-slate-50 text-slate-900 py-8">
       <FloatingLetters />
       
       <header className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-6 mb-8 relative z-10">
