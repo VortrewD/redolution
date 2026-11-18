@@ -291,19 +291,7 @@ export default function InternshipsDashboard() {
             <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition">Next</button>
           </div>
         )}
- {/* --- FOOTER --- */}
-      <footer className="bg-white border-t border-slate-200 py-12">
-        <div className="mx-auto max-w-7xl px-6 flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="flex items-center gap-2">
-            <img src="/redolution-logo.png" alt="REDOLUTION" className="h-6 w-auto grayscale opacity-50" />
-          </div>
-          <p className="text-sm text-slate-500 font-medium">© {new Date().getFullYear()} REDOLUTION. Built for students.</p>
-          <div className="flex gap-6">
-            <a href="#" className="text-slate-400 hover:text-red-600 transition">Twitter</a>
-            <a href="#" className="text-slate-400 hover:text-red-600 transition">LinkedIn</a>
-          </div>
-        </div>
-      </footer>
+
       </section>
     </main>
   );
