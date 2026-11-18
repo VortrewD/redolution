@@ -133,7 +133,7 @@ export default function InternshipsDashboard() {
   if (status === "loading" || !session) return <div className="min-h-screen flex items-center justify-center text-slate-500 font-bold">Loading...</div>;
 
   return (
-    <main className="mx-auto min-h-screen max-w-6xl px-4 py-8 relative bg-slate-50">
+    <main className="min-h-screen w-full relative bg-slate-50 px-4 py-8">
       <FloatingLetters />
       
       <AnimatePresence>
