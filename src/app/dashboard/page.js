@@ -100,7 +100,7 @@ export default function Dashboard() {
   }
 
   return (
-    <main className="mx-auto min-h-screen max-w-6xl px-4 py-8 relative bg-slate-50">
+   <main className="min-h-screen w-full relative bg-slate-50 px-4 py-8">
       <FloatingLetters />
       
       <header className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-6 mb-8 relative z-10">
