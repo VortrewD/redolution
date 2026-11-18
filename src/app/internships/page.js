@@ -292,6 +292,7 @@ export default function InternshipsDashboard() {
           </div>
         )}
       </section>
+    </main>
  {/* --- FOOTER --- */}
       <footer className="bg-white border-t border-slate-200 py-12">
         <div className="mx-auto max-w-7xl px-6 flex flex-col md:flex-row justify-between items-center gap-6">
@@ -305,7 +306,7 @@ export default function InternshipsDashboard() {
           </div>
         </div>
       </footer>
-    </main>
   );
 }
 
+   
